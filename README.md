@@ -1,20 +1,21 @@
 # NAL Mock API 🚀
 
-A free mock REST API for QA & SDET students — identical structure to GoRest.  
+A free mock REST API for QA & SDET students — a drop-in replacement for GoRest.  
 Built by **Naveen AutomationLabs**.
+
+🌐 **Live at: [https://gorest.in](https://gorest.in)**
 
 ---
 
-## ⚡ Deploy to Railway (Recommended — 2 minutes)
+## 🚀 Live API
 
-Railway runs your app as a **single persistent Node.js process**, so in-memory data is shared across all requests and all students hit the same server instance.
+The API is publicly available at:
 
-1. Push this folder to a GitHub repo
-2. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
-3. Select your repo → Railway auto-detects Node.js and deploys
-4. Your API is live at: `https://your-project.up.railway.app`
+```
+https://gorest.in/public/v2/users
+```
 
-> ⚠️ Data resets on redeploy. This is useful — redeploy anytime to get a clean slate for a new batch.
+No signup. No account. Just use it.
 
 ---
 
@@ -83,22 +84,22 @@ Only `blocked-token` is rejected (triggers 403, useful for testing forbidden sce
 
 ### GET all users — no token needed
 ```bash
-curl http://localhost:3000/public/v2/users
+curl https://gorest.in/public/v2/users
 ```
 
 ### GET with filters and pagination
 ```bash
-curl "http://localhost:3000/public/v2/users?status=active&gender=male&page=1&per_page=5"
+curl "https://gorest.in/public/v2/users?status=active&gender=male&page=1&per_page=5"
 ```
 
 ### GET single user — no token needed
 ```bash
-curl http://localhost:3000/public/v2/users/1001
+curl https://gorest.in/public/v2/users/1001
 ```
 
 ### POST — Create user (token required)
 ```bash
-curl -X POST http://localhost:3000/public/v2/users \
+curl -X POST https://gorest.in/public/v2/users \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer demo-token" \
   -d '{"name":"Naveen Kumar","email":"naveen@example.com","gender":"male","status":"active"}'
@@ -106,7 +107,7 @@ curl -X POST http://localhost:3000/public/v2/users \
 
 ### PUT — Full update (token required)
 ```bash
-curl -X PUT http://localhost:3000/public/v2/users/1001 \
+curl -X PUT https://gorest.in/public/v2/users/1001 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer demo-token" \
   -d '{"name":"Naveen Kumar","email":"naveen@example.com","gender":"male","status":"inactive"}'
@@ -114,7 +115,7 @@ curl -X PUT http://localhost:3000/public/v2/users/1001 \
 
 ### PATCH — Partial update (token required)
 ```bash
-curl -X PATCH http://localhost:3000/public/v2/users/1001 \
+curl -X PATCH https://gorest.in/public/v2/users/1001 \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer demo-token" \
   -d '{"status":"inactive"}'
@@ -122,7 +123,7 @@ curl -X PATCH http://localhost:3000/public/v2/users/1001 \
 
 ### DELETE user (token required)
 ```bash
-curl -X DELETE http://localhost:3000/public/v2/users/1001 \
+curl -X DELETE https://gorest.in/public/v2/users/1001 \
   -H "Authorization: Bearer demo-token"
 ```
 
