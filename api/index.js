@@ -3,7 +3,69 @@ const cors = require("cors");
 
 const app = express();
 app.use(cors());
+
+// ─── 415 Unsupported Media Type ───────────────────────────────────────────────
+// For POST/PUT/PATCH, reject if Content-Type is not application/json
+app.use((req, res, next) => {
+  const methodsRequiringJson = ["POST", "PUT", "PATCH"];
+  if (methodsRequiringJson.includes(req.method)) {
+    const ct = req.headers["content-type"] || "";
+    if (!ct.includes("application/json")) {
+      return res.status(415).json({ message: "Unsupported media type. Please send Content-Type: application/json" });
+    }
+  }
+  next();
+});
+
 app.use(express.json());
+
+// ─── 400 Bad Request — malformed JSON body ────────────────────────────────────
+app.use((err, req, res, next) => {
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ message: "Bad request. Invalid JSON in request body." });
+  }
+  next(err);
+});
+
+// ─── Rate Limiting (429) ──────────────────────────────────────────────────────
+const rateLimitMap = new Map();
+const RATE_LIMIT = 60;       // requests per window
+const RATE_WINDOW = 60000;   // 1 minute in ms
+
+app.use((req, res, next) => {
+  // Skip rate limiting for homepage
+  if (req.path === "/") return next();
+
+  const ip = req.ip || req.connection.remoteAddress || "unknown";
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip) || { count: 0, start: now };
+
+  // Reset window if expired
+  if (now - entry.start > RATE_WINDOW) {
+    entry.count = 0;
+    entry.start = now;
+  }
+
+  entry.count++;
+  rateLimitMap.set(ip, entry);
+
+  const remaining = Math.max(0, RATE_LIMIT - entry.count);
+  const resetSecs = Math.ceil((RATE_WINDOW - (now - entry.start)) / 1000);
+
+  res.set({
+    "X-RateLimit-Limit": RATE_LIMIT,
+    "X-RateLimit-Remaining": remaining,
+    "X-RateLimit-Reset": resetSecs,
+  });
+
+  if (entry.count > RATE_LIMIT) {
+    return res.status(429).json({
+      message: `Too many requests. Limit is ${RATE_LIMIT} requests/minute. Try again in ${resetSecs}s.`,
+    });
+  }
+
+  next();
+});
 
 // ─── Seed Data ────────────────────────────────────────────────────────────────
 let users = [
@@ -64,7 +126,39 @@ function validateUser(body, requireAll = true) {
   return errors;
 }
 
-// ─── Homepage ─────────────────────────────────────────────────────────────────
+// ─── 401 / 403 Auth Middleware ────────────────────────────────────────────────
+// GET all users and GET by ID are public (no token needed)
+// POST, PUT, PATCH, DELETE require Authorization: Bearer <token>
+// Any token value is accepted — students just need to send the header
+const DEMO_TOKENS = new Set(["demo-token", "test-token", "nal-token"]);
+
+app.use("/public/v2/users", (req, res, next) => {
+  if (req.method === "GET") return next(); // GET is public
+
+  const authHeader = req.headers["authorization"] || "";
+
+  // 401 — no Authorization header at all
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authentication failed. Please provide Authorization: Bearer <token> header." });
+  }
+
+  // Must be Bearer scheme
+  if (!authHeader.toLowerCase().startsWith("bearer ")) {
+    return res.status(401).json({ message: "Authentication failed. Use Bearer token scheme." });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  // 403 — token present but explicitly blocked (simulate forbidden)
+  if (token === "blocked-token") {
+    return res.status(403).json({ message: "Forbidden. This token does not have permission to access this endpoint." });
+  }
+
+  // Any other non-empty token is accepted (like GoRest)
+  next();
+});
+
+
 app.get("/", (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
@@ -183,13 +277,35 @@ app.get("/", (req, res) => {
           <li>200 — OK</li>
           <li>201 — Created (POST)</li>
           <li>204 — No Content (DELETE)</li>
+          <li>304 — Not Modified (cached)</li>
         </ul>
       </div>
       <div class="info-card">
-        <h3>Errors</h3>
+        <h3>Client Errors</h3>
         <ul>
+          <li>400 — Bad Request (invalid JSON)</li>
+          <li>401 — Unauthorized (missing token)</li>
+          <li>403 — Forbidden (blocked token)</li>
           <li>404 — Not Found</li>
+          <li>405 — Method Not Allowed</li>
+          <li>415 — Unsupported Media Type</li>
           <li>422 — Validation Failed</li>
+          <li>429 — Too Many Requests</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Server Errors</h3>
+        <ul>
+          <li>500 — Internal Server Error</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <h3>Auth Notes</h3>
+        <ul>
+          <li>GET — no token needed</li>
+          <li>POST/PUT/PATCH/DELETE — Bearer token required</li>
+          <li>Use any token e.g. "demo-token"</li>
+          <li>"blocked-token" → triggers 403</li>
         </ul>
       </div>
     </div>
@@ -203,6 +319,13 @@ app.get("/", (req, res) => {
 // ─── GET /public/v2/users ─────────────────────────────────────────────────────
 app.get("/public/v2/users", (req, res) => {
   let result = [...users];
+
+  // 304 — ETag / If-None-Match caching support
+  const etag = `"users-${users.length}-${nextId}"`;
+  res.set("ETag", etag);
+  if (req.headers["if-none-match"] === etag) {
+    return res.status(304).end();
+  }
 
   // Filtering
   if (req.query.name) result = result.filter((u) => u.name.toLowerCase().includes(req.query.name.toLowerCase()));
@@ -304,4 +427,24 @@ app.delete("/public/v2/users/:id", (req, res) => {
   res.status(204).send();
 });
 
+// ─── 405 Method Not Allowed ───────────────────────────────────────────────────
+// Catch unsupported methods on known paths
+app.all("/public/v2/users", (req, res) => {
+  res.set("Allow", "GET, POST");
+  res.status(405).json({ message: `Method ${req.method} not allowed on this endpoint. Allowed: GET, POST` });
+});
+
+app.all("/public/v2/users/:id", (req, res) => {
+  res.set("Allow", "GET, PUT, PATCH, DELETE");
+  res.status(405).json({ message: `Method ${req.method} not allowed on this endpoint. Allowed: GET, PUT, PATCH, DELETE` });
+});
+
+// ─── 500 Internal Server Error ────────────────────────────────────────────────
+// Global error handler — catches any unhandled thrown errors
+app.use((err, req, res, next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ message: "Internal server error. Something went wrong on our end." });
+});
+
 module.exports = app;
+
