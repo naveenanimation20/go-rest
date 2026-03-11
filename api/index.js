@@ -165,294 +165,631 @@ app.get("/", (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoRest.in — Free Mock REST API for QA & SDET Students</title>
-<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD on Users. No signup needed. Built by Naveen AutomationLabs.">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<title>GoRest.in — Free Mock REST API for QA & SDET</title>
+<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. No signup. Built by Naveen AutomationLabs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#0a0d13;color:#e2e8f0;font-family:'Syne',sans-serif;min-height:100vh}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* Hero */
-  .hero{background:linear-gradient(135deg,#0d1525 0%,#0a0d13 70%);border-bottom:1px solid #1e2640;padding:64px 40px 56px}
-  .hero-inner{max-width:960px;margin:0 auto}
-  .badge{display:inline-flex;align-items:center;gap:8px;background:#0f1e36;border:1px solid #1e3a5a;border-radius:20px;padding:6px 16px;font-size:12px;color:#64b5f6;font-family:'JetBrains Mono',monospace;margin-bottom:28px;letter-spacing:.5px}
-  .dot{width:7px;height:7px;background:#4caf50;border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
-  @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
-  h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;line-height:1.1;margin-bottom:16px}
-  h1 span.brand{background:linear-gradient(135deg,#ffffff 0%,#64b5f6 60%,#42a5f5 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  h1 span.tld{background:linear-gradient(135deg,#f97316 0%,#fb923c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-  .subtitle{color:#94a3b8;font-size:1.1rem;max-width:620px;line-height:1.7;margin-bottom:28px}
-  .hero-tags{display:flex;flex-wrap:wrap;gap:10px}
-  .tag{background:#111828;border:1px solid #1e2e48;border-radius:6px;padding:5px 12px;font-size:12px;font-family:'JetBrains Mono',monospace;color:#64b5f6}
+:root {
+  --paper:   #f7f4ef;
+  --paper2:  #efebe3;
+  --ink:     #18140f;
+  --ink2:    #52473a;
+  --ink3:    #9c8f80;
+  --line:    #ddd6cb;
+  --red:     #c0392b;
+  --blue:    #1a56db;
+  --green:   #1a6b3a;
+  --amber:   #92400e;
+  --code-bg: #131009;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --mono:  'Geist Mono', 'Menlo', monospace;
+  --sans:  'Geist', system-ui, sans-serif;
+}
 
-  /* Layout */
-  .container{max-width:960px;margin:0 auto;padding:48px 40px}
-  .section{margin-bottom:52px}
-  h2{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:#4a90e2;margin-bottom:20px;display:flex;align-items:center;gap:12px}
-  h2::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#1e2640 0%,transparent 100%)}
+html { font-size: 15px; }
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-  /* Base URL */
-  .base-url-box{background:#0d1525;border:1px solid #1e3a5a;border-radius:10px;padding:18px 24px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#64b5f6;letter-spacing:.3px;display:flex;align-items:center;gap:12px}
-  .base-url-box::before{content:'GET';background:#1a3a1a;color:#4caf50;border:1px solid #2a5a2a;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;flex-shrink:0}
+/* ─ TOP BAR ─────────────────── */
+.topbar {
+  background: var(--ink);
+  color: #b5a898;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .6px;
+  padding: 8px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topbar-live { display: flex; align-items: center; gap: 7px; color: #5fba7d; }
+.live-dot { width: 6px; height: 6px; background: #5fba7d; border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-  /* Endpoint table */
-  .endpoint-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px}
-  .endpoint-table thead tr{border-bottom:2px solid #1e2640}
-  .endpoint-table thead td{padding:8px 16px;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#4a6080}
-  .endpoint-table tbody tr{border-bottom:1px solid #111828;transition:background .15s}
-  .endpoint-table tbody tr:hover{background:#0e1520}
-  .endpoint-table td{padding:13px 16px;vertical-align:middle}
-  .method{display:inline-block;padding:3px 10px;border-radius:4px;font-weight:600;font-size:11px;min-width:58px;text-align:center;letter-spacing:.5px}
-  .GET{background:#0f2a0f;color:#4caf50;border:1px solid #1e4a1e}
-  .POST{background:#0f1e30;color:#64b5f6;border:1px solid #1e3a5a}
-  .PUT{background:#1e1a0a;color:#ffd54f;border:1px solid #3a300a}
-  .PATCH{background:#1a180a;color:#ffcc80;border:1px solid #352e0a}
-  .DELETE{background:#1e0a0a;color:#ef9a9a;border:1px solid #3a1a1a}
-  .auth-badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;margin-left:8px;font-family:'JetBrains Mono',monospace}
-  .auth-req{background:#1e1a0a;color:#ffd54f;border:1px solid #3a300a}
-  .auth-pub{background:#0f1e30;color:#64b5f6;border:1px solid #1e3a5a}
-  .path{color:#e2e8f0;font-size:13px}
-  .desc{color:#64748b;font-family:'Syne',sans-serif;font-size:13px}
+/* ─ HERO ─────────────────────── */
+.hero {
+  border-bottom: 1px solid var(--line);
+  padding: 72px 40px 64px;
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 5fr 4fr;
+  gap: 60px;
+  align-items: end;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(52px, 7vw, 88px);
+  line-height: .93;
+  letter-spacing: -1.5px;
+  color: var(--ink);
+  margin-bottom: 28px;
+}
+.hero-title .italic { font-style: italic; color: var(--red); }
+.hero-subtitle {
+  font-size: 15px;
+  color: var(--ink2);
+  font-weight: 300;
+  line-height: 1.8;
+  max-width: 380px;
+  margin-bottom: 32px;
+}
+.url-box {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  background: var(--ink);
+  color: #c8bfb2;
+  padding: 13px 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  white-space: nowrap;
+  margin-bottom: 20px;
+}
+.url-label {
+  background: var(--red);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 3px 9px;
+}
 
-  /* Code blocks */
-  .code-block{background:#080c12;border:1px solid #141e2e;border-radius:8px;overflow:hidden}
-  .code-header{background:#0d1525;padding:8px 16px;font-size:11px;font-family:'JetBrains Mono',monospace;color:#4a6080;border-bottom:1px solid #141e2e;letter-spacing:1px;text-transform:uppercase}
-  .code-body{padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;overflow-x:auto}
-  .k{color:#ce9178}.vs{color:#98c379}.vn{color:#d19a66}.cm{color:#4a5568}.cmd{color:#94a3b8}.flag{color:#64b5f6}.url{color:#4caf50}
+/* hero right — live tester */
+.hero-panel {
+  border-left: 1px solid var(--line);
+  padding-left: 48px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+.panel-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 4px;
+}
+.panel-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.panel-stat:last-child { border-bottom: none; }
+.panel-stat .key { color: var(--ink3); font-weight: 300; }
+.panel-stat .val { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.panel-stat .val.green { color: var(--green); }
 
-  /* Grid cards */
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-  @media(max-width:700px){.grid,.grid-3{grid-template-columns:1fr}}
-  .card{background:#0d1117;border:1px solid #141e2e;border-radius:8px;padding:18px 20px}
-  .card h3{font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:#4a90e2;margin-bottom:14px;font-weight:600}
-  .card ul{list-style:none;color:#94a3b8;font-size:13px;line-height:2}
-  .card ul li{display:flex;align-items:flex-start;gap:8px}
-  .card ul li::before{content:'→';color:#4a90e2;flex-shrink:0;margin-top:1px}
-  .card ul li code{font-family:'JetBrains Mono',monospace;color:#64b5f6;font-size:12px}
+/* ─ BODY LAYOUT ─────────────── */
+.wrap { max-width: 1080px; margin: 0 auto; }
+.body-grid {
+  display: grid;
+  grid-template-columns: 172px 1fr;
+  border-bottom: 1px solid var(--line);
+}
+.sidenav {
+  border-right: 1px solid var(--line);
+  padding: 36px 24px 36px 40px;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: fit-content;
+}
+.sidenav-title {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 14px;
+}
+.sidenav a {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink3);
+  text-decoration: none;
+  padding: 5px 0;
+  border-bottom: 1px solid transparent;
+  transition: color .12s;
+}
+.sidenav a:hover { color: var(--ink); }
 
-  /* Status codes table */
-  .status-table{width:100%;border-collapse:collapse;font-size:13px}
-  .status-table tr{border-bottom:1px solid #111828}
-  .status-table tr:hover{background:#0e1520}
-  .status-table td{padding:11px 14px;vertical-align:top}
-  .status-table td:first-child{font-family:'JetBrains Mono',monospace;font-weight:600;min-width:50px}
-  .s2{color:#4caf50}.s3{color:#64b5f6}.s4{color:#ffd54f}.s5{color:#ef9a9a}
-  .status-desc{color:#64748b;font-size:12px;margin-top:2px}
+/* ─ SECTIONS ────────────────── */
+.content { padding: 40px 52px 60px; }
+.sec { margin-bottom: 56px; }
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.sec-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--line);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.sec-title {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 400;
+}
 
-  /* Note box */
-  .note{background:#0f1e10;border:1px solid #1a3a1a;border-left:3px solid #4caf50;border-radius:6px;padding:14px 18px;font-size:13px;color:#94a3b8;line-height:1.7}
-  .note strong{color:#4caf50}
+/* ─ ENDPOINTS TABLE ─────────── */
+.ep { width: 100%; border-collapse: collapse; }
+.ep tr { border-bottom: 1px solid var(--line); }
+.ep tr:last-child { border-bottom: none; }
+.ep td { padding: 11px 0; vertical-align: middle; }
+.ep td:nth-child(1) { width: 66px; }
+.ep td:nth-child(2) { padding: 0 20px; }
+.ep td:nth-child(3) { width: 74px; }
+.ep td:nth-child(4) { color: var(--ink3); font-size: 13.5px; font-weight: 300; }
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: .5px;
+  display: inline-block;
+  text-align: center;
+  min-width: 54px;
+}
+.GET    { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
+.POST   { background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; }
+.PUT    { background:#fefce8; color:#713f12; border:1px solid #fde68a; }
+.PATCH  { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
+.DELETE { background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
+.open { background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0; }
+.lock { background:#fffbeb; color:#78350f; border:1px solid #fde68a; }
+.ep-path { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
 
-  footer{text-align:center;padding:32px 20px;color:#2d3748;font-size:12px;font-family:'JetBrains Mono',monospace;border-top:1px solid #0e1520}
-  footer a{color:#4a6080;text-decoration:none}
-  footer a:hover{color:#64b5f6}
+/* ─ CODE BLOCK ──────────────── */
+.codeblock { background: var(--code-bg); border-radius: 5px; overflow: hidden; margin-bottom: 14px; }
+.codeblock-bar {
+  background: #1e1a14;
+  padding: 7px 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #5c5248;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid #2a2520;
+}
+.codeblock pre {
+  padding: 16px 20px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: #c2b8ae;
+  overflow-x: auto;
+  white-space: pre;
+}
+.tok-k  { color: #e2b55e; }  /* key    */
+.tok-s  { color: #8fba78; }  /* string */
+.tok-n  { color: #d08b5b; }  /* number */
+.tok-c  { color: #4a4540; font-style: italic; } /* comment */
+.tok-cmd{ color: #79b8ff; }  /* command */
+.tok-f  { color: #8fba78; }  /* flag  */
+.tok-u  { color: #56b6c2; }  /* url  */
+.tok-q  { color: #e2b55e; }  /* quoted string */
+
+/* ─ STATUS TABLE ────────────── */
+.stat-wrap { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.stat-col { padding: 20px 22px; }
+.stat-col + .stat-col { border-left: 1px solid var(--line); }
+.stat-col-title {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.srow { display: flex; align-items: baseline; gap: 12px; padding: 6px 0; border-bottom: 1px dotted var(--line); }
+.srow:last-child { border-bottom: none; }
+.scode { font-family: var(--mono); font-size: 13px; font-weight: 500; min-width: 34px; }
+.s2 { color: #059669; } .s3 { color: #2563eb; } .s4 { color: #d97706; } .s5 { color: #dc2626; }
+.sdesc { font-size: 13px; color: var(--ink2); flex: 1; }
+.strig { font-family: var(--mono); font-size: 10.5px; color: var(--ink3); }
+
+/* ─ PARAM TABLE ─────────────── */
+.ptable { width: 100%; border-collapse: collapse; }
+.ptable tr { border-bottom: 1px solid var(--line); }
+.ptable tr:last-child { border-bottom: none; }
+.ptable td { padding: 10px 0; font-size: 13.5px; vertical-align: top; }
+.ptable td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); width: 210px; padding-right: 20px; }
+.ptable td:last-child { color: var(--ink2); font-weight: 300; }
+.ptable code { font-family: var(--mono); font-size: 11.5px; background: var(--paper2); padding: 1px 6px; border-radius: 2px; }
+
+/* ─ AUTH CALLOUT ────────────── */
+.callout {
+  border-left: 3px solid var(--red);
+  background: var(--paper2);
+  padding: 18px 22px;
+  border-radius: 0 4px 4px 0;
+}
+.callout p { font-size: 14px; color: var(--ink2); font-weight: 300; line-height: 1.75; margin-bottom: 9px; }
+.callout p:last-child { margin: 0; }
+.callout strong { color: var(--ink); font-weight: 500; }
+.callout code { font-family: var(--mono); font-size: 11.5px; background: var(--line); padding: 1px 6px; border-radius: 2px; color: var(--ink); }
+.warn { color: var(--red) !important; }
+
+/* ─ FOOTER ──────────────────── */
+.footer {
+  border-top: 2px solid var(--ink);
+  padding: 22px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer-brand {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  color: var(--ink);
+}
+.footer-links {
+  display: flex;
+  gap: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink3);
+}
+.footer-links a { color: var(--ink3); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 1px; transition: color .12s, border-color .12s; }
+.footer-links a:hover { color: var(--ink); border-color: var(--ink); }
+
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding: 48px 24px 40px; }
+  .hero-panel { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 28px; }
+  .body-grid { grid-template-columns: 1fr; }
+  .sidenav { display: none; }
+  .content { padding: 32px 24px 48px; }
+  .stat-wrap { grid-template-columns: 1fr; }
+  .stat-col + .stat-col { border-left: none; border-top: 1px solid var(--line); }
+  .topbar, .footer { padding-left: 24px; padding-right: 24px; }
+}
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-inner">
-    <div class="badge"><span class="dot"></span> API ONLINE &nbsp;·&nbsp; gorest.in</div>
-    <h1><span class="brand">GoRest</span><span class="tld">.in</span></h1>
-    <p class="subtitle">A free mock REST API for QA &amp; SDET students. Drop-in replacement for gorest.co.in — full CRUD on Users, real HTTP responses, no signup needed.</p>
-    <div class="hero-tags">
-      <span class="tag">REST API</span>
-      <span class="tag">CRUD</span>
-      <span class="tag">JSON</span>
-      <span class="tag">Pagination</span>
-      <span class="tag">Bearer Auth</span>
-      <span class="tag">Rate Limiting</span>
-      <span class="tag">Free Forever</span>
-    </div>
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-live">
+    <span class="live-dot"></span>
+    API online
   </div>
+  <span>gorest.in &mdash; free mock REST API</span>
 </div>
 
-<div class="container">
+<div class="wrap">
 
-  <!-- Base URL -->
-  <div class="section">
-    <h2>Base URL</h2>
-    <div class="base-url-box">https://gorest.in/public/v2/users</div>
-  </div>
-
-  <!-- Endpoints -->
-  <div class="section">
-    <h2>User Endpoints</h2>
-    <table class="endpoint-table">
-      <thead><tr><td>Method</td><td>Endpoint</td><td>Auth</td><td>Description</td></tr></thead>
-      <tbody>
-        <tr><td><span class="method GET">GET</span></td><td class="path">/public/v2/users</td><td><span class="auth-badge auth-pub">public</span></td><td class="desc">List all users (paginated)</td></tr>
-        <tr><td><span class="method POST">POST</span></td><td class="path">/public/v2/users</td><td><span class="auth-badge auth-req">token</span></td><td class="desc">Create a new user</td></tr>
-        <tr><td><span class="method GET">GET</span></td><td class="path">/public/v2/users/:id</td><td><span class="auth-badge auth-pub">public</span></td><td class="desc">Get user by ID</td></tr>
-        <tr><td><span class="method PUT">PUT</span></td><td class="path">/public/v2/users/:id</td><td><span class="auth-badge auth-req">token</span></td><td class="desc">Replace user (full update)</td></tr>
-        <tr><td><span class="method PATCH">PATCH</span></td><td class="path">/public/v2/users/:id</td><td><span class="auth-badge auth-req">token</span></td><td class="desc">Update user (partial)</td></tr>
-        <tr><td><span class="method DELETE">DELETE</span></td><td class="path">/public/v2/users/:id</td><td><span class="auth-badge auth-req">token</span></td><td class="desc">Delete user</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Auth -->
-  <div class="section">
-    <h2>Authentication</h2>
-    <div class="note">
-      <strong>GET requests are public</strong> — no token needed.<br>
-      <strong>POST, PUT, PATCH, DELETE</strong> require an <code style="color:#64b5f6;font-family:'JetBrains Mono',monospace">Authorization: Bearer &lt;token&gt;</code> header.<br>
-      Any non-empty token is accepted. Use <code style="color:#64b5f6;font-family:'JetBrains Mono',monospace">demo-token</code>, <code style="color:#64b5f6;font-family:'JetBrains Mono',monospace">abc123</code>, or anything you like.<br>
-      Only <code style="color:#ef9a9a;font-family:'JetBrains Mono',monospace">blocked-token</code> is rejected → returns <strong style="color:#ef9a9a">403 Forbidden</strong> (useful for testing).
-    </div>
-  </div>
-
-  <!-- User Schema -->
-  <div class="section">
-    <h2>User Schema</h2>
-    <div class="code-block">
-      <div class="code-header">JSON Response</div>
-      <div class="code-body">{<br>
-&nbsp;&nbsp;<span class="k">"id"</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="vn">1001</span>,<br>
-&nbsp;&nbsp;<span class="k">"name"</span>:&nbsp;&nbsp;&nbsp;<span class="vs">"Aarav Sharma"</span>,<br>
-&nbsp;&nbsp;<span class="k">"email"</span>:&nbsp;&nbsp;<span class="vs">"aarav.sharma@example.com"</span>,<br>
-&nbsp;&nbsp;<span class="k">"gender"</span>: <span class="vs">"male"</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">// "male" | "female"</span><br>
-&nbsp;&nbsp;<span class="k">"status"</span>: <span class="vs">"active"</span>&nbsp;&nbsp;<span class="cm">// "active" | "inactive"</span><br>
-}</div>
-    </div>
-  </div>
-
-  <!-- Query Params -->
-  <div class="section">
-    <h2>Query Parameters</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Filtering</h3>
-        <ul>
-          <li><code>?name=aarav</code></li>
-          <li><code>?email=example.com</code></li>
-          <li><code>?gender=male</code></li>
-          <li><code>?status=active</code></li>
-        </ul>
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <h1 class="hero-title">Free<br><span class="italic">Mock</span><br>API.</h1>
+      <p class="hero-subtitle">A drop-in replacement for gorest.co.in &mdash; built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
+      <div class="url-box">
+        <span class="url-label">Base URL</span>
+        https://gorest.in/public/v2/users
       </div>
-      <div class="card">
-        <h3>Pagination</h3>
-        <ul>
-          <li><code>?page=1</code></li>
-          <li><code>?per_page=10</code> &nbsp;(max 100)</li>
-          <li><code>X-Pagination-Total</code></li>
-          <li><code>X-Pagination-Pages</code></li>
-          <li><code>X-Pagination-Page</code></li>
-          <li><code>X-Pagination-Limit</code></li>
-        </ul>
+      <div class="chips">
+        <span class="chip">REST</span>
+        <span class="chip">CRUD</span>
+        <span class="chip">JSON</span>
+        <span class="chip">Pagination</span>
+        <span class="chip">Bearer Auth</span>
+        <span class="chip">13 Status Codes</span>
+        <span class="chip">Rate Limiting</span>
       </div>
     </div>
-  </div>
-
-  <!-- cURL Examples -->
-  <div class="section">
-    <h2>cURL Examples</h2>
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-      <div class="code-block">
-        <div class="code-header">GET — List users (public)</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="url">https://gorest.in/public/v2/users</span></div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">GET — With pagination &amp; filters</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="vs">"https://gorest.in/public/v2/users?page=1&amp;per_page=10&amp;status=active"</span></div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">GET — Single user by ID (public)</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="url">https://gorest.in/public/v2/users/1001</span></div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">POST — Create user (token required)</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="flag">-X POST</span> https://gorest.in/public/v2/users \<br>
-&nbsp;&nbsp;<span class="flag">-H</span> <span class="vs">"Content-Type: application/json"</span> \<br>
-&nbsp;&nbsp;<span class="flag">-H</span> <span class="vs">"Authorization: Bearer demo-token"</span> \<br>
-&nbsp;&nbsp;<span class="flag">-d</span> <span class="vs">'{"name":"Naveen Kumar","email":"naveen@example.com","gender":"male","status":"active"}'</span></div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">PATCH — Partial update (token required)</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="flag">-X PATCH</span> https://gorest.in/public/v2/users/1001 \<br>
-&nbsp;&nbsp;<span class="flag">-H</span> <span class="vs">"Content-Type: application/json"</span> \<br>
-&nbsp;&nbsp;<span class="flag">-H</span> <span class="vs">"Authorization: Bearer demo-token"</span> \<br>
-&nbsp;&nbsp;<span class="flag">-d</span> <span class="vs">'{"status":"inactive"}'</span></div>
-      </div>
-
-      <div class="code-block">
-        <div class="code-header">DELETE — Delete user (token required)</div>
-        <div class="code-body"><span class="cmd">curl</span> <span class="flag">-X DELETE</span> https://gorest.in/public/v2/users/1001 \<br>
-&nbsp;&nbsp;<span class="flag">-H</span> <span class="vs">"Authorization: Bearer demo-token"</span></div>
-      </div>
-
+    <div class="hero-panel">
+      <div class="panel-label">API Info</div>
+      <div class="panel-stat"><span class="key">Status</span><span class="val green">&#9679; Operational</span></div>
+      <div class="panel-stat"><span class="key">Seed users</span><span class="val">20 (IDs 1001–1020)</span></div>
+      <div class="panel-stat"><span class="key">Rate limit</span><span class="val">60 req / min</span></div>
+      <div class="panel-stat"><span class="key">Auth required</span><span class="val">POST / PUT / PATCH / DELETE</span></div>
+      <div class="panel-stat"><span class="key">Replaces</span><span class="val">gorest.co.in</span></div>
+      <div class="panel-stat"><span class="key">Built by</span><span class="val">Naveen AutomationLabs</span></div>
     </div>
-  </div>
+  </section>
 
-  <!-- HTTP Status Codes -->
-  <div class="section">
-    <h2>HTTP Status Codes</h2>
-    <div class="grid">
-      <div class="card">
-        <h3>Success 2xx / 3xx</h3>
-        <table class="status-table">
-          <tr><td class="s2">200</td><td>OK — successful GET, PUT, PATCH</td></tr>
-          <tr><td class="s2">201</td><td>Created — successful POST</td></tr>
-          <tr><td class="s2">204</td><td>No Content — successful DELETE</td></tr>
-          <tr><td class="s3">304</td><td>Not Modified — ETag cache hit</td></tr>
+  <!-- BODY -->
+  <div class="body-grid">
+
+    <!-- SIDENAV -->
+    <nav class="sidenav">
+      <div class="sidenav-title">Contents</div>
+      <a href="#endpoints">Endpoints</a>
+      <a href="#auth">Auth</a>
+      <a href="#schema">Schema</a>
+      <a href="#params">Query Params</a>
+      <a href="#examples">cURL Examples</a>
+      <a href="#status">Status Codes</a>
+      <a href="#rate">Rate Limiting</a>
+      <a href="#notes">Notes</a>
+    </nav>
+
+    <main class="content">
+
+      <!-- 01 ENDPOINTS -->
+      <div class="sec" id="endpoints">
+        <div class="sec-head">
+          <span class="sec-num">01</span>
+          <span class="sec-title">Endpoints</span>
+        </div>
+        <table class="ep">
+          <tr>
+            <td><span class="badge GET">GET</span></td>
+            <td class="ep-path">/public/v2/users</td>
+            <td><span class="badge open">public</span></td>
+            <td>List all users &mdash; supports pagination &amp; filtering</td>
+          </tr>
+          <tr>
+            <td><span class="badge POST">POST</span></td>
+            <td class="ep-path">/public/v2/users</td>
+            <td><span class="badge lock">token</span></td>
+            <td>Create a new user</td>
+          </tr>
+          <tr>
+            <td><span class="badge GET">GET</span></td>
+            <td class="ep-path">/public/v2/users/:id</td>
+            <td><span class="badge open">public</span></td>
+            <td>Fetch single user by ID</td>
+          </tr>
+          <tr>
+            <td><span class="badge PUT">PUT</span></td>
+            <td class="ep-path">/public/v2/users/:id</td>
+            <td><span class="badge lock">token</span></td>
+            <td>Full replace &mdash; all fields required</td>
+          </tr>
+          <tr>
+            <td><span class="badge PATCH">PATCH</span></td>
+            <td class="ep-path">/public/v2/users/:id</td>
+            <td><span class="badge lock">token</span></td>
+            <td>Partial update &mdash; send only changed fields</td>
+          </tr>
+          <tr>
+            <td><span class="badge DELETE">DELETE</span></td>
+            <td class="ep-path">/public/v2/users/:id</td>
+            <td><span class="badge lock">token</span></td>
+            <td>Remove user permanently</td>
+          </tr>
         </table>
       </div>
-      <div class="card">
-        <h3>Client Errors 4xx</h3>
-        <table class="status-table">
-          <tr><td class="s4">400</td><td>Bad Request — invalid JSON body</td></tr>
-          <tr><td class="s4">401</td><td>Unauthorized — missing token</td></tr>
-          <tr><td class="s4">403</td><td>Forbidden — blocked-token used</td></tr>
-          <tr><td class="s4">404</td><td>Not Found — user ID doesn't exist</td></tr>
-          <tr><td class="s4">405</td><td>Method Not Allowed</td></tr>
-          <tr><td class="s4">415</td><td>Unsupported Media Type</td></tr>
-          <tr><td class="s4">422</td><td>Validation Failed — check fields</td></tr>
-          <tr><td class="s4">429</td><td>Too Many Requests — rate limited</td></tr>
-          <tr><td class="s5">500</td><td>Internal Server Error</td></tr>
+
+      <!-- 02 AUTH -->
+      <div class="sec" id="auth">
+        <div class="sec-head">
+          <span class="sec-num">02</span>
+          <span class="sec-title">Authentication</span>
+        </div>
+        <div class="callout">
+          <p><strong>GET requests are public</strong> &mdash; no token needed. Open them straight in Postman or your browser.</p>
+          <p><strong>POST, PUT, PATCH, DELETE</strong> require an <code>Authorization: Bearer &lt;token&gt;</code> header. Any non-empty string works &mdash; <code>demo-token</code>, <code>abc123</code>, your own name, anything.</p>
+          <p class="warn">One exception: <code>blocked-token</code> deliberately returns <strong>403 Forbidden</strong> &mdash; useful for testing error-handling flows.</p>
+        </div>
+      </div>
+
+      <!-- 03 SCHEMA -->
+      <div class="sec" id="schema">
+        <div class="sec-head">
+          <span class="sec-num">03</span>
+          <span class="sec-title">User Schema</span>
+        </div>
+        <div class="codeblock">
+          <div class="codeblock-bar">application/json</div>
+          <pre>{
+  <span class="tok-k">"id"</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-n">1001</span>,
+  <span class="tok-k">"name"</span>:&nbsp;&nbsp;&nbsp;<span class="tok-s">"Aarav Sharma"</span>,
+  <span class="tok-k">"email"</span>:&nbsp;&nbsp;<span class="tok-s">"aarav.sharma@example.com"</span>,
+  <span class="tok-k">"gender"</span>: <span class="tok-s">"male"</span>     <span class="tok-c">// "male" | "female"</span>
+  <span class="tok-k">"status"</span>: <span class="tok-s">"active"</span>   <span class="tok-c">// "active" | "inactive"</span>
+}</pre>
+        </div>
+      </div>
+
+      <!-- 04 QUERY PARAMS -->
+      <div class="sec" id="params">
+        <div class="sec-head">
+          <span class="sec-num">04</span>
+          <span class="sec-title">Query Parameters</span>
+        </div>
+        <table class="ptable">
+          <tr><td>?name=</td><td>Filter by name (partial match). e.g. <code>?name=aarav</code></td></tr>
+          <tr><td>?email=</td><td>Filter by email. e.g. <code>?email=example.com</code></td></tr>
+          <tr><td>?gender=</td><td>Filter by gender &mdash; <code>male</code> or <code>female</code></td></tr>
+          <tr><td>?status=</td><td>Filter by status &mdash; <code>active</code> or <code>inactive</code></td></tr>
+          <tr><td>?page=</td><td>Page number. Default: <code>1</code></td></tr>
+          <tr><td>?per_page=</td><td>Results per page. Default: <code>10</code>&nbsp;&nbsp;Max: <code>100</code></td></tr>
         </table>
       </div>
-    </div>
+
+      <!-- 05 CURL -->
+      <div class="sec" id="examples">
+        <div class="sec-head">
+          <span class="sec-num">05</span>
+          <span class="sec-title">cURL Examples</span>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; List users &mdash; no token needed</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users</span></pre>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; Paginate &amp; filter</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-q">"https://gorest.in/public/v2/users?page=1&per_page=10&status=active"</span></pre>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; Single user by ID</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users/1001</span></pre>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge POST" style="font-size:9.5px;padding:1px 7px">POST</span>&nbsp; Create user</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X POST</span> https://gorest.in/public/v2/users \
+  <span class="tok-f">-H</span> <span class="tok-q">"Content-Type: application/json"</span> \
+  <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span> \
+  <span class="tok-f">-d</span> <span class="tok-q">'{"name":"Naveen Kumar","email":"nk@test.com","gender":"male","status":"active"}'</span></pre>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge PATCH" style="font-size:9.5px;padding:1px 7px">PATCH</span>&nbsp; Partial update</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X PATCH</span> https://gorest.in/public/v2/users/1001 \
+  <span class="tok-f">-H</span> <span class="tok-q">"Content-Type: application/json"</span> \
+  <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span> \
+  <span class="tok-f">-d</span> <span class="tok-q">'{"status":"inactive"}'</span></pre>
+        </div>
+
+        <div class="codeblock">
+          <div class="codeblock-bar"><span class="badge DELETE" style="font-size:9.5px;padding:1px 7px">DELETE</span>&nbsp; Delete user</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X DELETE</span> https://gorest.in/public/v2/users/1001 \
+  <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span></pre>
+        </div>
+
+      </div>
+
+      <!-- 06 STATUS CODES -->
+      <div class="sec" id="status">
+        <div class="sec-head">
+          <span class="sec-num">06</span>
+          <span class="sec-title">HTTP Status Codes</span>
+        </div>
+        <div class="stat-wrap">
+          <div class="stat-col">
+            <div class="stat-col-title">2xx &mdash; 3xx &nbsp; Success</div>
+            <div class="srow"><span class="scode s2">200</span><span class="sdesc">OK</span><span class="strig">GET / PUT / PATCH</span></div>
+            <div class="srow"><span class="scode s2">201</span><span class="sdesc">Created</span><span class="strig">POST</span></div>
+            <div class="srow"><span class="scode s2">204</span><span class="sdesc">No Content</span><span class="strig">DELETE</span></div>
+            <div class="srow"><span class="scode s3">304</span><span class="sdesc">Not Modified</span><span class="strig">ETag cache hit</span></div>
+          </div>
+          <div class="stat-col">
+            <div class="stat-col-title">4xx &mdash; 5xx &nbsp; Errors</div>
+            <div class="srow"><span class="scode s4">400</span><span class="sdesc">Bad Request</span><span class="strig">invalid JSON</span></div>
+            <div class="srow"><span class="scode s4">401</span><span class="sdesc">Unauthorized</span><span class="strig">missing token</span></div>
+            <div class="srow"><span class="scode s4">403</span><span class="sdesc">Forbidden</span><span class="strig">blocked-token</span></div>
+            <div class="srow"><span class="scode s4">404</span><span class="sdesc">Not Found</span><span class="strig">unknown ID</span></div>
+            <div class="srow"><span class="scode s4">405</span><span class="sdesc">Method Not Allowed</span><span class="strig">wrong verb</span></div>
+            <div class="srow"><span class="scode s4">415</span><span class="sdesc">Unsupported Media Type</span><span class="strig">no Content-Type</span></div>
+            <div class="srow"><span class="scode s4">422</span><span class="sdesc">Validation Failed</span><span class="strig">bad field values</span></div>
+            <div class="srow"><span class="scode s4">429</span><span class="sdesc">Too Many Requests</span><span class="strig">&gt;60 / min</span></div>
+            <div class="srow"><span class="scode s5">500</span><span class="sdesc">Internal Server Error</span><span class="strig">unexpected crash</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 07 RATE LIMITING -->
+      <div class="sec" id="rate">
+        <div class="sec-head">
+          <span class="sec-num">07</span>
+          <span class="sec-title">Rate Limiting</span>
+        </div>
+        <table class="ptable">
+          <tr><td>X-RateLimit-Limit</td><td>Max requests per minute &mdash; <strong>60</strong></td></tr>
+          <tr><td>X-RateLimit-Remaining</td><td>Requests left in the current window</td></tr>
+          <tr><td>X-RateLimit-Reset</td><td>Seconds until the window resets</td></tr>
+        </table>
+      </div>
+
+      <!-- 08 NOTES -->
+      <div class="sec" id="notes">
+        <div class="sec-head">
+          <span class="sec-num">08</span>
+          <span class="sec-title">Notes</span>
+        </div>
+        <table class="ptable">
+          <tr><td>Seed data</td><td>20 pre-loaded users, IDs 1001&ndash;1020. New users auto-increment from 1021.</td></tr>
+          <tr><td>Persistence</td><td>In-memory only &mdash; resets on server restart. Intentional; clean slate every session.</td></tr>
+          <tr><td>Duplicate email</td><td>Returns 422 with a field-level validation message.</td></tr>
+          <tr><td>Pagination headers</td><td><code>X-Pagination-Total</code> &nbsp;<code>X-Pagination-Pages</code> &nbsp;<code>X-Pagination-Page</code> &nbsp;<code>X-Pagination-Limit</code></td></tr>
+          <tr><td>Replaces</td><td>gorest.co.in &mdash; same URL structure, compatible with existing Postman collections.</td></tr>
+        </table>
+      </div>
+
+    </main>
   </div>
 
-  <!-- Rate Limiting -->
-  <div class="section">
-    <h2>Rate Limiting</h2>
-    <div class="card">
-      <h3>Headers returned on every request</h3>
-      <ul>
-        <li><code>X-RateLimit-Limit</code> &nbsp;— max requests per minute (60)</li>
-        <li><code>X-RateLimit-Remaining</code> &nbsp;— requests left in current window</li>
-        <li><code>X-RateLimit-Reset</code> &nbsp;— seconds until window resets</li>
-      </ul>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-brand">Built for the QA community.</div>
+    <div class="footer-links">
+      <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs &nearr;</a>
+      <a href="https://gorest.in/public/v2/users" target="_blank">Try the API &nearr;</a>
+      <span>Free forever</span>
     </div>
-  </div>
-
-  <!-- Notes -->
-  <div class="section">
-    <h2>Notes</h2>
-    <div class="note">
-      <strong>Seed data:</strong> 20 pre-loaded users (IDs 1001–1020). New users start from ID 1021.<br>
-      <strong>Data persistence:</strong> Data lives in memory — resets on server restart. Clean slate every time.<br>
-      <strong>Duplicate emails:</strong> Attempting to create a user with an existing email returns 422.<br>
-      <strong>Rate limit:</strong> 60 requests/minute per IP. Exceeding returns 429.<br>
-      <strong>Open source:</strong> Built by <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank" style="color:#64b5f6">Naveen AutomationLabs</a> for the QA community.
-    </div>
-  </div>
+  </footer>
 
 </div>
-<footer>
-  Built with ❤️ by <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs</a>
-  &nbsp;·&nbsp; Free for the QA &amp; SDET community
-  &nbsp;·&nbsp; <a href="https://gorest.in/public/v2/users" target="_blank">Try the API →</a>
-</footer>
 </body>
 </html>`);
+
+
 });
 
 // ─── GET /public/v2/users ─────────────────────────────────────────────────────
