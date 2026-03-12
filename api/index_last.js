@@ -795,65 +795,8 @@ body {
 
 });
 
-// ─── XML HELPERS ──────────────────────────────────────────────────────────────
-function escapeXml(val) {
-  return String(val)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
-
-function userToXml(u) {
-  const t = (tag, val) => '    <' + tag + '>' + val + '</' + tag + '>';
-  return [
-    '  <user>',
-    t('id', u.id),
-    t('name', escapeXml(u.name)),
-    t('email', escapeXml(u.email)),
-    t('gender', escapeXml(u.gender)),
-    t('status', escapeXml(u.status)),
-    '  </user>'
-  ].join('\n');
-}
-
-function usersToXml(arr) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<users>\n${arr.map(userToXml).join("\n")}\n</users>`;
-}
-
-function errorToXml(msg) {
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<error>\n  <message>${escapeXml(msg)}</message>\n</error>`;
-}
-
-function errorsToXml(errors) {
-  const items = errors.map(e => `  <error>\n    <field>${escapeXml(e.field)}</field>\n    <message>${escapeXml(e.message)}</message>\n  </error>`).join("\n");
-  return `<?xml version="1.0" encoding="UTF-8"?>\n<errors>\n${items}\n</errors>`;
-}
-
-// Detect if client wants XML — via .xml suffix or Accept header
-function wantsXml(req, xmlSuffix) {
-  return xmlSuffix || (req.headers["accept"] && req.headers["accept"].includes("application/xml"));
-}
-
-function sendData(res, status, data, xml, isXml) {
-  if (isXml) {
-    res.set("Content-Type", "application/xml; charset=utf-8");
-    return res.status(status).send(xml);
-  }
-  res.status(status).json(data);
-}
-
-// ─── GET /public/v2/users(.xml)? ──────────────────────────────────────────────
+// ─── GET /public/v2/users ─────────────────────────────────────────────────────
 app.get("/public/v2/users", (req, res) => {
-  return handleGetUsers(req, res, false);
-});
-app.get("/public/v2/users.xml", (req, res) => {
-  return handleGetUsers(req, res, true);
-});
-
-function handleGetUsers(req, res, xmlSuffix) {
-  const isXml = wantsXml(req, xmlSuffix);
   let result = [...users];
 
   // 304 — ETag / If-None-Match caching support
@@ -864,8 +807,8 @@ function handleGetUsers(req, res, xmlSuffix) {
   }
 
   // Filtering
-  if (req.query.name)   result = result.filter((u) => u.name.toLowerCase().includes(req.query.name.toLowerCase()));
-  if (req.query.email)  result = result.filter((u) => u.email.toLowerCase().includes(req.query.email.toLowerCase()));
+  if (req.query.name) result = result.filter((u) => u.name.toLowerCase().includes(req.query.name.toLowerCase()));
+  if (req.query.email) result = result.filter((u) => u.email.toLowerCase().includes(req.query.email.toLowerCase()));
   if (req.query.gender) result = result.filter((u) => u.gender === req.query.gender);
   if (req.query.status) result = result.filter((u) => u.status === req.query.status);
 
@@ -883,24 +826,14 @@ function handleGetUsers(req, res, xmlSuffix) {
     "X-Pagination-Page": page,
     "X-Pagination-Limit": perPage,
   });
+  res.status(200).json(paginated);
+});
 
-  sendData(res, 200, paginated, usersToXml(paginated), isXml);
-}
-
-// ─── POST /public/v2/users(.xml)? ─────────────────────────────────────────────
+// ─── POST /public/v2/users ────────────────────────────────────────────────────
 app.post("/public/v2/users", (req, res) => {
-  return handlePostUser(req, res, false);
-});
-app.post("/public/v2/users.xml", (req, res) => {
-  return handlePostUser(req, res, true);
-});
-
-function handlePostUser(req, res, xmlSuffix) {
-  const isXml = wantsXml(req, xmlSuffix);
   const errors = validateUser(req.body, true);
-  if (errors.length) {
-    return sendData(res, 422, errors, errorsToXml(errors), isXml);
-  }
+  if (errors.length) return res.status(422).json(errors);
+
   const user = {
     id: nextId++,
     name: req.body.name.trim(),
@@ -909,47 +842,30 @@ function handlePostUser(req, res, xmlSuffix) {
     status: req.body.status,
   };
   users.push(user);
-  sendData(res, 201, user, `<?xml version="1.0" encoding="UTF-8"?>\n${userToXml(user).trim()}`, isXml);
-}
-
-// ─── GET /public/v2/users/:id(.xml)? ──────────────────────────────────────────
-app.get("/public/v2/users/:id.xml", (req, res) => {
-  req.params.id = req.params.id.replace(/\.xml$/, "");
-  return handleGetUser(req, res, true);
+  res.status(201).json(user);
 });
+
+// ─── GET /public/v2/users/:id ─────────────────────────────────────────────────
 app.get("/public/v2/users/:id", (req, res) => {
-  return handleGetUser(req, res, false);
-});
-
-
-function handleGetUser(req, res, xmlSuffix) {
-  const isXml = wantsXml(req, xmlSuffix);
   const user = users.find((u) => u.id === parseInt(req.params.id));
-  if (!user) return sendData(res, 404, { message: "Resource not found" }, errorToXml("Resource not found"), isXml);
-  sendData(res, 200, user, `<?xml version="1.0" encoding="UTF-8"?>\n${userToXml(user).trim()}`, isXml);
-}
-
-// ─── PUT /public/v2/users/:id(.xml)? ──────────────────────────────────────────
-app.put("/public/v2/users/:id.xml", (req, res) => {
-  req.params.id = req.params.id.replace(/\.xml$/, "");
-  return handlePutUser(req, res, true);
+  if (!user) return res.status(404).json({ message: "Resource not found" });
+  res.status(200).json(user);
 });
+
+// ─── PUT /public/v2/users/:id ────────────────────────────────────────────────
 app.put("/public/v2/users/:id", (req, res) => {
-  return handlePutUser(req, res, false);
-});
-
-
-function handlePutUser(req, res, xmlSuffix) {
-  const isXml = wantsXml(req, xmlSuffix);
   const idx = users.findIndex((u) => u.id === parseInt(req.params.id));
-  if (idx === -1) return sendData(res, 404, { message: "Resource not found" }, errorToXml("Resource not found"), isXml);
+  if (idx === -1) return res.status(404).json({ message: "Resource not found" });
 
+  // For PUT, validate all fields (exclude current user's email from duplicate check)
+  const currentEmail = users[idx].email;
+  const bodyCopy = { ...req.body };
   const tempUsers = users.filter((_, i) => i !== idx);
   const savedUsers = users;
   users = tempUsers;
-  const errors = validateUser(req.body, true);
+  const errors = validateUser(bodyCopy, true);
   users = savedUsers;
-  if (errors.length) return sendData(res, 422, errors, errorsToXml(errors), isXml);
+  if (errors.length) return res.status(422).json(errors);
 
   users[idx] = {
     id: users[idx].id,
@@ -958,66 +874,46 @@ function handlePutUser(req, res, xmlSuffix) {
     gender: req.body.gender,
     status: req.body.status,
   };
-  sendData(res, 200, users[idx], `<?xml version="1.0" encoding="UTF-8"?>\n${userToXml(users[idx]).trim()}`, isXml);
-}
-
-// ─── PATCH /public/v2/users/:id(.xml)? ──────────────────────────────────────────
-app.patch("/public/v2/users/:id.xml", (req, res) => {
-  req.params.id = req.params.id.replace(/\.xml$/, "");
-  return handlePatchUser(req, res, true);
+  res.status(200).json(users[idx]);
 });
+
+// ─── PATCH /public/v2/users/:id ──────────────────────────────────────────────
 app.patch("/public/v2/users/:id", (req, res) => {
-  return handlePatchUser(req, res, false);
-});
-
-
-function handlePatchUser(req, res, xmlSuffix) {
-  const isXml = wantsXml(req, xmlSuffix);
   const idx = users.findIndex((u) => u.id === parseInt(req.params.id));
-  if (idx === -1) return sendData(res, 404, { message: "Resource not found" }, errorToXml("Resource not found"), isXml);
+  if (idx === -1) return res.status(404).json({ message: "Resource not found" });
 
+  // Partial validate — only fields sent
   const savedUsers = users;
   const tempUsers = users.filter((_, i) => i !== idx);
   users = tempUsers;
   const errors = validateUser(req.body, false);
   users = savedUsers;
-  if (errors.length) return sendData(res, 422, errors, errorsToXml(errors), isXml);
+  if (errors.length) return res.status(422).json(errors);
 
-  if (req.body.name   !== undefined) users[idx].name   = req.body.name.trim();
-  if (req.body.email  !== undefined) users[idx].email  = req.body.email.trim().toLowerCase();
+  if (req.body.name !== undefined) users[idx].name = req.body.name.trim();
+  if (req.body.email !== undefined) users[idx].email = req.body.email.trim().toLowerCase();
   if (req.body.gender !== undefined) users[idx].gender = req.body.gender;
   if (req.body.status !== undefined) users[idx].status = req.body.status;
 
-  sendData(res, 200, users[idx], `<?xml version="1.0" encoding="UTF-8"?>\n${userToXml(users[idx]).trim()}`, isXml);
-}
-
-// ─── DELETE /public/v2/users/:id(.xml)? ──────────────────────────────────────────
-app.delete("/public/v2/users/:id.xml", (req, res) => {
-  req.params.id = req.params.id.replace(/\.xml$/, "");
-  return handleDeleteUser(req, res, true);
+  res.status(200).json(users[idx]);
 });
+
+// ─── DELETE /public/v2/users/:id ─────────────────────────────────────────────
 app.delete("/public/v2/users/:id", (req, res) => {
-  return handleDeleteUser(req, res, false);
-});
-
-
-function handleDeleteUser(req, res, xmlSuffix) {
   const idx = users.findIndex((u) => u.id === parseInt(req.params.id));
-  if (idx === -1) {
-    const isXml = wantsXml(req, xmlSuffix);
-    return sendData(res, 404, { message: "Resource not found" }, errorToXml("Resource not found"), isXml);
-  }
+  if (idx === -1) return res.status(404).json({ message: "Resource not found" });
   users.splice(idx, 1);
   res.status(204).send();
-}
+});
 
 // ─── 405 Method Not Allowed ───────────────────────────────────────────────────
+// Catch unsupported methods on known paths
 app.all("/public/v2/users", (req, res) => {
   res.set("Allow", "GET, POST");
   res.status(405).json({ message: `Method ${req.method} not allowed on this endpoint. Allowed: GET, POST` });
 });
 
-app.all(/^\/public\/v2\/users\/\d+(\.xml)?$/, (req, res) => {
+app.all("/public/v2/users/:id", (req, res) => {
   res.set("Allow", "GET, PUT, PATCH, DELETE");
   res.status(405).json({ message: `Method ${req.method} not allowed on this endpoint. Allowed: GET, PUT, PATCH, DELETE` });
 });
