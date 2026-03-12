@@ -253,8 +253,8 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  overflow-x: auto;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-all;
   margin-bottom: 20px;
 }
 .url-label {
@@ -403,7 +403,7 @@ body {
 .ep-path { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
 
 /* ─ CODE BLOCK ──────────────── */
-.codeblock { background: var(--code-bg); border-radius: 5px; overflow: hidden; margin-bottom: 14px; }
+.codeblock { background: var(--code-bg); border-radius: 5px; overflow: hidden; margin-bottom: 14px; word-wrap: break-word; }
 .codeblock-bar {
   background: #1e1a14;
   padding: 7px 16px;
@@ -423,8 +423,10 @@ body {
   font-size: 12.5px;
   line-height: 1.85;
   color: #c2b8ae;
-  overflow-x: auto;
-  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 .tok-k  { color: #e2b55e; }  /* key    */
 .tok-s  { color: #8fba78; }  /* string */
