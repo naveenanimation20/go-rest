@@ -166,161 +166,170 @@ app.get("/", (req, res) => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GoRest.in — Free Mock REST API for QA & SDET</title>
-<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. No signup. Built by Naveen AutomationLabs.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231a1612'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23c0392b' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%235fba7d'>.in</text></svg>">
+<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD. JSON & XML. No signup. Built by Naveen AutomationLabs.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%2311141c'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23e05c3a' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%2334d399'>.in</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; scroll-behavior: smooth; }
 
 :root {
-  --paper:   #f7f4ef;
-  --paper2:  #efebe3;
-  --ink:     #18140f;
-  --ink2:    #52473a;
-  --ink3:    #9c8f80;
-  --line:    #ddd6cb;
-  --red:     #c0392b;
-  --blue:    #1a56db;
-  --green:   #1a6b3a;
-  --amber:   #92400e;
-  --code-bg: #131009;
-  --serif: 'Instrument Serif', Georgia, serif;
-  --mono:  'Geist Mono', 'Menlo', monospace;
-  --sans:  'Geist', system-ui, sans-serif;
+  --bg:       #0d1117;
+  --bg2:      #161b22;
+  --bg3:      #1c2230;
+  --border:   #2a3344;
+  --border2:  #374151;
+  --text:     #e6edf3;
+  --text2:    #b0bec8;
+  --text3:    #6e7f8d;
+  --red:      #e05c3a;
+  --red-dim:  #3d1a10;
+  --blue:     #4f9cf9;
+  --blue-dim: #0f2040;
+  --green:    #34d399;
+  --green-dim:#0a2e20;
+  --amber:    #f59e0b;
+  --amber-dim:#2d1f06;
+  --mono:  'IBM Plex Mono', monospace;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans:  'DM Sans', system-ui, sans-serif;
 }
 
-html { font-size: 15px; }
 body {
   font-family: var(--sans);
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─ TOP BAR ─────────────────── */
+/* ─ TOP BAR ─────────────────────────────── */
 .topbar {
-  background: var(--ink);
-  color: #b5a898;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .6px;
-  padding: 8px 40px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 9px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text3);
+  letter-spacing: .5px;
 }
-.topbar-live { display: flex; align-items: center; gap: 7px; color: #5fba7d; }
-.live-dot { width: 6px; height: 6px; background: #5fba7d; border-radius: 50%; animation: blink 2s ease-in-out infinite; }
+.topbar-live { display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 500; }
+.live-dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: blink 2.5s ease-in-out infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.topbar-links { display: flex; gap: 20px; }
+.topbar-links a { color: var(--text3); text-decoration: none; transition: color .12s; }
+.topbar-links a:hover { color: var(--text); }
 
-/* ─ HERO ─────────────────────── */
+/* ─ HERO ─────────────────────────────────── */
 .hero {
-  border-bottom: 1px solid var(--line);
-  padding: 72px 40px 64px;
-  max-width: 1080px;
+  border-bottom: 1px solid var(--border);
+  padding: 72px 48px 64px;
+  max-width: 1100px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 5fr 4fr;
-  gap: 60px;
-  align-items: end;
+  gap: 64px;
+  align-items: center;
 }
 .hero-title {
   font-family: var(--serif);
-  font-size: clamp(52px, 7vw, 88px);
-  line-height: .93;
-  letter-spacing: -1.5px;
-  color: var(--ink);
+  font-size: clamp(52px, 6vw, 82px);
+  line-height: .92;
+  letter-spacing: -2px;
+  color: var(--text);
   margin-bottom: 28px;
 }
 .hero-title .italic { font-style: italic; color: var(--red); }
-.hero-subtitle {
+.hero-desc {
   font-size: 15px;
-  color: var(--ink2);
+  color: var(--text2);
   font-weight: 300;
   line-height: 1.8;
-  max-width: 380px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
+  max-width: 400px;
 }
 .url-box {
   font-family: var(--mono);
-  font-size: 12.5px;
-  background: var(--ink);
-  color: #c8bfb2;
+  font-size: 13px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--green);
   padding: 13px 18px;
-  border-radius: 4px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 12px;
-  white-space: normal;
-  word-break: break-all;
+  overflow-x: auto;
+  white-space: nowrap;
   margin-bottom: 20px;
 }
 .url-label {
   background: var(--red);
   color: #fff;
   font-size: 9.5px;
-  font-weight: 500;
+  font-weight: 600;
   padding: 2px 8px;
-  border-radius: 2px;
+  border-radius: 3px;
   letter-spacing: 1px;
   text-transform: uppercase;
   flex-shrink: 0;
 }
-.chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 10.5px;
   letter-spacing: .4px;
-  text-transform: uppercase;
-  color: var(--ink3);
-  border: 1px solid var(--line);
-  border-radius: 2px;
-  padding: 3px 9px;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 10px;
+  background: var(--bg2);
 }
 
-/* hero right — live tester */
+/* hero right panel */
 .hero-panel {
-  border-left: 1px solid var(--line);
-  padding-left: 48px;
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
 }
-.panel-label {
+.panel-title {
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--ink3);
-  margin-bottom: 4px;
+  color: var(--text3);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
-.panel-stat {
+.panel-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
-.panel-stat:last-child { border-bottom: none; }
-.panel-stat .key { color: var(--ink3); font-weight: 300; }
-.panel-stat .val { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
-.panel-stat .val.green { color: var(--green); }
+.panel-row:last-child { border-bottom: none; }
+.panel-row .k { color: var(--text3); font-weight: 300; }
+.panel-row .v { font-family: var(--mono); font-size: 12px; color: var(--text); }
+.panel-row .v.green { color: var(--green); }
 
-/* ─ BODY LAYOUT ─────────────── */
-.wrap { max-width: 1080px; margin: 0 auto; }
+/* ─ LAYOUT ───────────────────────────────── */
+.wrap { max-width: 1100px; margin: 0 auto; }
 .body-grid {
   display: grid;
-  grid-template-columns: 172px 1fr;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: 180px 1fr;
+  border-bottom: 1px solid var(--border);
 }
 .sidenav {
-  border-right: 1px solid var(--line);
-  padding: 36px 24px 36px 40px;
+  border-right: 1px solid var(--border);
+  padding: 32px 20px 32px 40px;
   position: sticky;
   top: 0;
   align-self: start;
@@ -331,189 +340,182 @@ body {
   font-size: 9.5px;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: var(--ink3);
+  color: var(--text3);
   margin-bottom: 14px;
 }
 .sidenav a {
   display: block;
   font-family: var(--mono);
   font-size: 11.5px;
-  color: var(--ink3);
+  color: var(--text3);
   text-decoration: none;
   padding: 5px 0;
-  border-bottom: 1px solid transparent;
-  transition: color .12s;
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+  margin-left: -10px;
+  transition: color .12s, border-color .12s;
 }
-.sidenav a:hover { color: var(--ink); }
+.sidenav a:hover { color: var(--text); border-color: var(--red); }
 
-/* ─ SECTIONS ────────────────── */
-.content { padding: 40px 52px 60px; }
-.sec { margin-bottom: 56px; }
+/* ─ CONTENT ──────────────────────────────── */
+.content { padding: 40px 52px 64px; }
+.sec { margin-bottom: 60px; }
 .sec-head {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--border);
 }
-.sec-num {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--line);
-  letter-spacing: 1px;
-  flex-shrink: 0;
-}
+.sec-num { font-family: var(--mono); font-size: 10px; color: var(--border2); letter-spacing: 1px; }
 .sec-title {
   font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 2.5px;
+  font-size: 11px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--red);
-  font-weight: 400;
+  font-weight: 500;
 }
 
-/* ─ ENDPOINTS TABLE ─────────── */
+/* ─ ENDPOINT TABLE ───────────────────────── */
 .ep { width: 100%; border-collapse: collapse; }
-.ep tr { border-bottom: 1px solid var(--line); }
+.ep tr { border-bottom: 1px solid var(--border); }
 .ep tr:last-child { border-bottom: none; }
-.ep td { padding: 11px 0; vertical-align: middle; }
-.ep td:nth-child(1) { width: 66px; }
+.ep tr:hover { background: var(--bg2); }
+.ep td { padding: 12px 4px; vertical-align: middle; }
 .ep td:nth-child(2) { padding: 0 20px; }
-.ep td:nth-child(3) { width: 74px; }
-.ep td:nth-child(4) { color: var(--ink3); font-size: 13.5px; font-weight: 300; }
+.ep td:nth-child(3) { width: 76px; }
+.ep td:nth-child(4) { color: var(--text2); font-size: 13.5px; font-weight: 300; }
 .badge {
   font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  padding: 3px 8px;
-  border-radius: 2px;
-  letter-spacing: .5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 3px;
   display: inline-block;
   text-align: center;
-  min-width: 54px;
+  min-width: 58px;
+  letter-spacing: .5px;
 }
-.GET    { background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; }
-.POST   { background:#eff6ff; color:#1e3a8a; border:1px solid #bfdbfe; }
-.PUT    { background:#fefce8; color:#713f12; border:1px solid #fde68a; }
-.PATCH  { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; }
-.DELETE { background:#fef2f2; color:#7f1d1d; border:1px solid #fecaca; }
-.open { background:#f0fdf4; color:#14532d; border:1px solid #bbf7d0; }
-.lock { background:#fffbeb; color:#78350f; border:1px solid #fde68a; }
-.ep-path { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.GET    { background: var(--green-dim); color: var(--green);  border: 1px solid #1a5c42; }
+.POST   { background: var(--blue-dim);  color: var(--blue);   border: 1px solid #1a3a6e; }
+.PUT    { background: var(--amber-dim); color: var(--amber);  border: 1px solid #5c3a08; }
+.PATCH  { background: #2a1f0a; color: #fb923c; border: 1px solid #5c3a08; }
+.DELETE { background: var(--red-dim);   color: #f87171;       border: 1px solid #5c1a10; }
+.open { background: var(--green-dim); color: var(--green); border: 1px solid #1a5c42; font-size: 10px; padding: 2px 8px; }
+.lock { background: var(--amber-dim); color: var(--amber); border: 1px solid #5c3a08; font-size: 10px; padding: 2px 8px; }
+.ep-path { font-family: var(--mono); font-size: 13px; color: var(--text); }
 
-/* ─ CODE BLOCK ──────────────── */
-.codeblock { background: var(--code-bg); border-radius: 5px; overflow: hidden; margin-bottom: 14px; word-wrap: break-word; }
+/* ─ CALLOUT ──────────────────────────────── */
+.callout {
+  border-left: 3px solid var(--red);
+  background: var(--bg2);
+  border-radius: 0 6px 6px 0;
+  padding: 18px 22px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+}
+.callout.blue { border-left-color: var(--blue); }
+.callout p { font-size: 14px; color: var(--text2); line-height: 1.75; margin-bottom: 10px; font-weight: 300; }
+.callout p:last-child { margin: 0; }
+.callout strong { color: var(--text); font-weight: 500; }
+.callout code {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--blue);
+}
+.callout .warn { color: #f87171; }
+
+/* ─ CODE BLOCKS ──────────────────────────── */
+.codeblock { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
 .codeblock-bar {
-  background: #1e1a14;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
   padding: 7px 16px;
   font-family: var(--mono);
-  font-size: 10px;
-  color: #5c5248;
+  font-size: 10.5px;
+  color: var(--text3);
   letter-spacing: 1px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid #2a2520;
 }
 .codeblock pre {
   padding: 16px 20px;
   font-family: var(--mono);
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.85;
-  color: #c2b8ae;
+  color: var(--text2);
   white-space: pre-wrap;
   word-break: break-word;
   overflow-wrap: anywhere;
-  max-width: 100%;
 }
-.tok-k  { color: #e2b55e; }  /* key    */
-.tok-s  { color: #8fba78; }  /* string */
-.tok-n  { color: #d08b5b; }  /* number */
-.tok-c  { color: #4a4540; font-style: italic; } /* comment */
-.tok-cmd{ color: #79b8ff; }  /* command */
-.tok-f  { color: #8fba78; }  /* flag  */
-.tok-u  { color: #56b6c2; }  /* url  */
-.tok-q  { color: #e2b55e; }  /* quoted string */
+.tok-k   { color: #e2b55e; }
+.tok-s   { color: var(--green); }
+.tok-n   { color: #d08b5b; }
+.tok-c   { color: var(--text3); font-style: italic; }
+.tok-cmd { color: var(--blue); }
+.tok-f   { color: #7dd3fc; }
+.tok-u   { color: var(--green); }
+.tok-q   { color: #e2b55e; }
 
-/* ─ STATUS TABLE ────────────── */
-.stat-wrap { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
-.stat-col { padding: 20px 22px; }
-.stat-col + .stat-col { border-left: 1px solid var(--line); }
-.stat-col-title {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--ink3);
-  padding-bottom: 10px;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--line);
-}
-.srow { display: flex; align-items: baseline; gap: 12px; padding: 6px 0; border-bottom: 1px dotted var(--line); }
-.srow:last-child { border-bottom: none; }
-.scode { font-family: var(--mono); font-size: 13px; font-weight: 500; min-width: 34px; }
-.s2 { color: #059669; } .s3 { color: #2563eb; } .s4 { color: #d97706; } .s5 { color: #dc2626; }
-.sdesc { font-size: 13px; color: var(--ink2); flex: 1; }
-.strig { font-family: var(--mono); font-size: 10.5px; color: var(--ink3); }
+/* ─ SCHEMA BOX ───────────────────────────── */
+.schema-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.schema-bar { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 8px 18px; font-family: var(--mono); font-size: 10.5px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+.schema-body { padding: 20px 22px; font-family: var(--mono); font-size: 13px; line-height: 1.9; color: var(--text2); }
 
-/* ─ PARAM TABLE ─────────────── */
+/* ─ PARAM TABLE ──────────────────────────── */
 .ptable { width: 100%; border-collapse: collapse; }
-.ptable tr { border-bottom: 1px solid var(--line); }
+.ptable tr { border-bottom: 1px solid var(--border); }
 .ptable tr:last-child { border-bottom: none; }
-.ptable td { padding: 10px 0; font-size: 13.5px; vertical-align: top; }
-.ptable td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); width: 210px; padding-right: 20px; }
-.ptable td:last-child { color: var(--ink2); font-weight: 300; }
-.ptable code { font-family: var(--mono); font-size: 11.5px; background: var(--paper2); padding: 1px 6px; border-radius: 2px; }
+.ptable tr:hover { background: var(--bg2); }
+.ptable td { padding: 11px 4px; font-size: 13.5px; vertical-align: top; }
+.ptable td:first-child { font-family: var(--mono); font-size: 12px; color: var(--blue); width: 220px; padding-right: 20px; }
+.ptable td:last-child { color: var(--text2); font-weight: 300; }
+.ptable code { font-family: var(--mono); font-size: 11.5px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 6px; border-radius: 3px; color: var(--amber); }
 
-/* ─ AUTH CALLOUT ────────────── */
-.callout {
-  border-left: 3px solid var(--red);
-  background: var(--paper2);
-  padding: 18px 22px;
-  border-radius: 0 4px 4px 0;
-}
-.callout p { font-size: 14px; color: var(--ink2); font-weight: 300; line-height: 1.75; margin-bottom: 9px; }
-.callout p:last-child { margin: 0; }
-.callout strong { color: var(--ink); font-weight: 500; }
-.callout code { font-family: var(--mono); font-size: 11.5px; background: var(--line); padding: 1px 6px; border-radius: 2px; color: var(--ink); }
-.warn { color: var(--red) !important; }
+/* ─ STATUS TABLE ─────────────────────────── */
+.stat-wrap { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--bg2); }
+.stat-col { padding: 20px 24px; }
+.stat-col + .stat-col { border-left: 1px solid var(--border); }
+.stat-col-title { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); padding-bottom: 12px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+.srow { display: flex; align-items: baseline; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.srow:last-child { border-bottom: none; }
+.srow:hover { background: var(--bg3); margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+.scode { font-family: var(--mono); font-size: 13.5px; font-weight: 600; min-width: 38px; }
+.s2 { color: var(--green); } .s3 { color: var(--blue); } .s4 { color: var(--amber); } .s5 { color: #f87171; }
+.sdesc { font-size: 13.5px; color: var(--text); flex: 1; }
+.strig { font-family: var(--mono); font-size: 11px; color: var(--text3); }
 
-/* ─ FOOTER ──────────────────── */
+/* ─ FOOTER ───────────────────────────────── */
 .footer {
-  border-top: 2px solid var(--ink);
-  padding: 22px 40px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  padding: 24px 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
   flex-wrap: wrap;
+  gap: 12px;
 }
-.footer-brand {
-  font-family: var(--serif);
-  font-size: 1.15rem;
-  font-style: italic;
-  color: var(--ink);
-}
-.footer-links {
-  display: flex;
-  gap: 24px;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink3);
-}
-.footer-links a { color: var(--ink3); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 1px; transition: color .12s, border-color .12s; }
-.footer-links a:hover { color: var(--ink); border-color: var(--ink); }
+.footer-brand { font-family: var(--serif); font-size: 1.1rem; font-style: italic; color: var(--text); }
+.footer-links { display: flex; gap: 24px; font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.footer-links a { color: var(--text3); text-decoration: none; border-bottom: 1px solid var(--border); padding-bottom: 1px; transition: color .12s, border-color .12s; }
+.footer-links a:hover { color: var(--text); border-color: var(--text3); }
 
-@media (max-width: 760px) {
-  .hero { grid-template-columns: 1fr; gap: 36px; padding: 48px 24px 40px; }
-  .hero-panel { border-left: none; border-top: 1px solid var(--line); padding-left: 0; padding-top: 28px; }
+@media (max-width: 800px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; padding: 48px 24px; }
   .body-grid { grid-template-columns: 1fr; }
   .sidenav { display: none; }
   .content { padding: 32px 24px 48px; }
   .stat-wrap { grid-template-columns: 1fr; }
-  .stat-col + .stat-col { border-left: none; border-top: 1px solid var(--line); }
+  .stat-col + .stat-col { border-left: none; border-top: 1px solid var(--border); }
   .topbar, .footer { padding-left: 24px; padding-right: 24px; }
 }
 </style>
@@ -522,11 +524,11 @@ body {
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-live">
-    <span class="live-dot"></span>
-    API online
+  <div class="topbar-live"><span class="live-dot"></span>API Online — gorest.in</div>
+  <div class="topbar-links">
+    <a href="/privacy">Privacy Policy</a>
+    <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">YouTube ↗</a>
   </div>
-  <span>gorest.in &mdash; free mock REST API</span>
 </div>
 
 <div class="wrap">
@@ -535,7 +537,7 @@ body {
   <section class="hero">
     <div>
       <h1 class="hero-title">Free<br><span class="italic">Mock</span><br>API.</h1>
-      <p class="hero-subtitle">A drop-in replacement for gorest.co.in &mdash; built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
+      <p class="hero-desc">A drop-in replacement for gorest.co.in — built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
       <div class="url-box">
         <span class="url-label">Base URL</span>
         https://gorest.in/public/v2/users
@@ -543,30 +545,28 @@ body {
       <div class="chips">
         <span class="chip">REST</span>
         <span class="chip">CRUD</span>
-        <span class="chip">JSON</span>
+        <span class="chip">JSON &amp; XML</span>
         <span class="chip">Pagination</span>
         <span class="chip">Bearer Auth</span>
         <span class="chip">13 Status Codes</span>
         <span class="chip">Rate Limiting</span>
-        <span class="chip">JSON &amp; XML</span>
+        <span class="chip">Free Forever</span>
       </div>
     </div>
     <div class="hero-panel">
-      <div class="panel-label">API Info</div>
-      <div class="panel-stat"><span class="key">Status</span><span class="val green">&#9679; Operational</span></div>
-      <div class="panel-stat"><span class="key">Seed users</span><span class="val">20 (IDs 1001–1020)</span></div>
-      <div class="panel-stat"><span class="key">Rate limit</span><span class="val">60 req / min</span></div>
-      <div class="panel-stat"><span class="key">Auth required</span><span class="val">POST / PUT / PATCH / DELETE</span></div>
-      <div class="panel-stat"><span class="key">Formats</span><span class="val">JSON &amp; XML</span></div>
-      <div class="panel-stat"><span class="key">Replaces</span><span class="val">gorest.co.in</span></div>
-      <div class="panel-stat"><span class="key">Built by</span><span class="val">Naveen AutomationLabs</span></div>
+      <div class="panel-title">API Quick Info</div>
+      <div class="panel-row"><span class="k">Status</span><span class="v green">● Operational</span></div>
+      <div class="panel-row"><span class="k">Formats</span><span class="v">JSON &amp; XML</span></div>
+      <div class="panel-row"><span class="k">Seed users</span><span class="v">20 (IDs 1001–1020)</span></div>
+      <div class="panel-row"><span class="k">Rate limit</span><span class="v">60 req / min</span></div>
+      <div class="panel-row"><span class="k">Auth required</span><span class="v">POST / PUT / PATCH / DELETE</span></div>
+      <div class="panel-row"><span class="k">Replaces</span><span class="v">gorest.co.in</span></div>
+      <div class="panel-row"><span class="k">Built by</span><span class="v">Naveen AutomationLabs</span></div>
     </div>
   </section>
 
   <!-- BODY -->
   <div class="body-grid">
-
-    <!-- SIDENAV -->
     <nav class="sidenav">
       <div class="sidenav-title">Contents</div>
       <a href="#endpoints">Endpoints</a>
@@ -584,16 +584,13 @@ body {
 
       <!-- 01 ENDPOINTS -->
       <div class="sec" id="endpoints">
-        <div class="sec-head">
-          <span class="sec-num">01</span>
-          <span class="sec-title">Endpoints</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">Endpoints</span></div>
         <table class="ep">
           <tr>
             <td><span class="badge GET">GET</span></td>
             <td class="ep-path">/public/v2/users</td>
             <td><span class="badge open">public</span></td>
-            <td>List all users &mdash; supports pagination &amp; filtering</td>
+            <td>List all users — paginated &amp; filterable</td>
           </tr>
           <tr>
             <td><span class="badge POST">POST</span></td>
@@ -611,13 +608,13 @@ body {
             <td><span class="badge PUT">PUT</span></td>
             <td class="ep-path">/public/v2/users/:id</td>
             <td><span class="badge lock">token</span></td>
-            <td>Full replace &mdash; all fields required</td>
+            <td>Full replace — all fields required</td>
           </tr>
           <tr>
             <td><span class="badge PATCH">PATCH</span></td>
             <td class="ep-path">/public/v2/users/:id</td>
             <td><span class="badge lock">token</span></td>
-            <td>Partial update &mdash; send only changed fields</td>
+            <td>Partial update — send only changed fields</td>
           </tr>
           <tr>
             <td><span class="badge DELETE">DELETE</span></td>
@@ -630,64 +627,50 @@ body {
 
       <!-- 02 AUTH -->
       <div class="sec" id="auth">
-        <div class="sec-head">
-          <span class="sec-num">02</span>
-          <span class="sec-title">Authentication</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">02</span><span class="sec-title">Authentication</span></div>
         <div class="callout">
-          <p><strong>GET requests are public</strong> &mdash; no token needed. Open them straight in Postman or your browser.</p>
-          <p><strong>POST, PUT, PATCH, DELETE</strong> require an <code>Authorization: Bearer &lt;token&gt;</code> header. Any non-empty string works &mdash; <code>demo-token</code>, <code>abc123</code>, your own name, anything.</p>
-          <p class="warn">One exception: <code>blocked-token</code> deliberately returns <strong>403 Forbidden</strong> &mdash; useful for testing error-handling flows.</p>
+          <p><strong>GET requests are open</strong> — no token needed. Hit them straight from browser, Postman, or any test tool.</p>
+          <p><strong>POST, PUT, PATCH, DELETE</strong> require an <code>Authorization: Bearer &lt;token&gt;</code> header. Any non-empty string works — <code>demo-token</code>, <code>abc123</code>, your name, anything.</p>
+          <p class="warn">⚠ Exception: <code>blocked-token</code> deliberately returns <strong>403 Forbidden</strong> — useful for testing error-handling flows.</p>
         </div>
       </div>
 
       <!-- 03 SCHEMA -->
       <div class="sec" id="schema">
-        <div class="sec-head">
-          <span class="sec-num">03</span>
-          <span class="sec-title">User Schema</span>
-        </div>
-        <div class="codeblock">
-          <div class="codeblock-bar">application/json</div>
-          <pre>{
-  <span class="tok-k">"id"</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-n">1001</span>,
-  <span class="tok-k">"name"</span>:&nbsp;&nbsp;&nbsp;<span class="tok-s">"Aarav Sharma"</span>,
-  <span class="tok-k">"email"</span>:&nbsp;&nbsp;<span class="tok-s">"aarav.sharma@example.com"</span>,
-  <span class="tok-k">"gender"</span>: <span class="tok-s">"male"</span>     <span class="tok-c">// "male" | "female"</span>
-  <span class="tok-k">"status"</span>: <span class="tok-s">"active"</span>   <span class="tok-c">// "active" | "inactive"</span>
-}</pre>
+        <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">User Schema</span></div>
+        <div class="schema-box">
+          <div class="schema-bar">application/json</div>
+          <div class="schema-body">{<br>
+&nbsp;&nbsp;<span class="tok-k">"id"</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-n">1001</span>,<br>
+&nbsp;&nbsp;<span class="tok-k">"name"</span>:&nbsp;&nbsp;&nbsp;<span class="tok-s">"Aarav Sharma"</span>,<br>
+&nbsp;&nbsp;<span class="tok-k">"email"</span>:&nbsp;&nbsp;<span class="tok-s">"aarav.sharma@example.com"</span>,<br>
+&nbsp;&nbsp;<span class="tok-k">"gender"</span>: <span class="tok-s">"male"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tok-c">// "male" | "female"</span><br>
+&nbsp;&nbsp;<span class="tok-k">"status"</span>: <span class="tok-s">"active"</span>&nbsp;&nbsp;&nbsp;<span class="tok-c">// "active" | "inactive"</span><br>
+}</div>
         </div>
       </div>
 
       <!-- 04 QUERY PARAMS -->
       <div class="sec" id="params">
-        <div class="sec-head">
-          <span class="sec-num">04</span>
-          <span class="sec-title">Query Parameters</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Query Parameters</span></div>
         <table class="ptable">
-          <tr><td>?name=</td><td>Filter by name (partial match). e.g. <code>?name=aarav</code></td></tr>
-          <tr><td>?email=</td><td>Filter by email. e.g. <code>?email=example.com</code></td></tr>
-          <tr><td>?gender=</td><td>Filter by gender &mdash; <code>male</code> or <code>female</code></td></tr>
-          <tr><td>?status=</td><td>Filter by status &mdash; <code>active</code> or <code>inactive</code></td></tr>
+          <tr><td>?name=</td><td>Filter by name (partial match) — e.g. <code>?name=aarav</code></td></tr>
+          <tr><td>?email=</td><td>Filter by email — e.g. <code>?email=example.com</code></td></tr>
+          <tr><td>?gender=</td><td>Filter by gender — <code>male</code> or <code>female</code></td></tr>
+          <tr><td>?status=</td><td>Filter by status — <code>active</code> or <code>inactive</code></td></tr>
           <tr><td>?page=</td><td>Page number. Default: <code>1</code></td></tr>
-          <tr><td>?per_page=</td><td>Results per page. Default: <code>10</code>&nbsp;&nbsp;Max: <code>100</code></td></tr>
+          <tr><td>?per_page=</td><td>Results per page. Default: <code>10</code> &nbsp; Max: <code>100</code></td></tr>
         </table>
       </div>
 
-
-      <!-- 05 RESPONSE FORMAT -->
+      <!-- 05 JSON & XML -->
       <div class="sec" id="format">
-        <div class="sec-head">
-          <span class="sec-num">05</span>
-          <span class="sec-title">Response Format — JSON &amp; XML</span>
-        </div>
-        <div class="callout" style="border-color: var(--blue);">
-          <p>All endpoints return <strong>JSON by default</strong>. To get XML, use either method below:</p>
+        <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Response Format — JSON &amp; XML</span></div>
+        <div class="callout blue" style="margin-bottom:16px">
+          <p>All endpoints return <strong>JSON by default</strong>. Request XML using either method:</p>
           <p><strong>Option 1 — URL suffix:</strong> append <code>.xml</code> to any endpoint URL.</p>
-          <p><strong>Option 2 — Accept header:</strong> send <code>Accept: application/xml</code> in your request headers.</p>
+          <p><strong>Option 2 — Accept header:</strong> send <code>Accept: application/xml</code> in your request.</p>
         </div>
-        <div style="margin-top:16px">
         <div class="codeblock">
           <div class="codeblock-bar">URL suffix — collection</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users.xml</span></pre>
@@ -706,78 +689,65 @@ body {
 <span class="tok-k">&lt;users&gt;</span>
   <span class="tok-k">&lt;user&gt;</span>
     <span class="tok-k">&lt;id&gt;</span><span class="tok-n">1001</span><span class="tok-k">&lt;/id&gt;</span>
-    <span class="tok-k">&lt;n&gt;</span><span class="tok-s">Aarav Sharma</span><span class="tok-k">&lt;/n&gt;</span>
+    <span class="tok-k">&lt;name&gt;</span><span class="tok-s">Aarav Sharma</span><span class="tok-k">&lt;/name&gt;</span>
     <span class="tok-k">&lt;email&gt;</span><span class="tok-s">aarav.sharma@example.com</span><span class="tok-k">&lt;/email&gt;</span>
     <span class="tok-k">&lt;gender&gt;</span><span class="tok-s">male</span><span class="tok-k">&lt;/gender&gt;</span>
     <span class="tok-k">&lt;status&gt;</span><span class="tok-s">active</span><span class="tok-k">&lt;/status&gt;</span>
   <span class="tok-k">&lt;/user&gt;</span>
 <span class="tok-k">&lt;/users&gt;</span></pre>
         </div>
-        </div>
       </div>
 
-      <!-- 06 CURL -->
+      <!-- 06 CURL EXAMPLES -->
       <div class="sec" id="examples">
-        <div class="sec-head">
-          <span class="sec-num">06</span>
-          <span class="sec-title">cURL Examples</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">cURL Examples</span></div>
 
         <div class="codeblock">
-          <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; List users &mdash; no token needed</div>
+          <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; List users — no token needed</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users</span></pre>
         </div>
-
         <div class="codeblock">
           <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; Paginate &amp; filter</div>
-          <pre><span class="tok-cmd">curl</span> <span class="tok-q">"https://gorest.in/public/v2/users?page=1&per_page=10&status=active"</span></pre>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-q">"https://gorest.in/public/v2/users?page=1&amp;per_page=10&amp;status=active"</span></pre>
         </div>
-
         <div class="codeblock">
           <div class="codeblock-bar"><span class="badge GET" style="font-size:9.5px;padding:1px 7px">GET</span>&nbsp; Single user by ID</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users/1001</span></pre>
         </div>
-
         <div class="codeblock">
-          <div class="codeblock-bar"><span class="badge POST" style="font-size:9.5px;padding:1px 7px">POST</span>&nbsp; Create user</div>
+          <div class="codeblock-bar"><span class="badge POST" style="font-size:9.5px;padding:1px 7px">POST</span>&nbsp; Create user — token required</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X POST</span> https://gorest.in/public/v2/users \
   <span class="tok-f">-H</span> <span class="tok-q">"Content-Type: application/json"</span> \
   <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span> \
   <span class="tok-f">-d</span> <span class="tok-q">'{"name":"Naveen Kumar","email":"nk@test.com","gender":"male","status":"active"}'</span></pre>
         </div>
-
         <div class="codeblock">
-          <div class="codeblock-bar"><span class="badge PATCH" style="font-size:9.5px;padding:1px 7px">PATCH</span>&nbsp; Partial update</div>
+          <div class="codeblock-bar"><span class="badge PATCH" style="font-size:9.5px;padding:1px 7px">PATCH</span>&nbsp; Partial update — token required</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X PATCH</span> https://gorest.in/public/v2/users/1001 \
   <span class="tok-f">-H</span> <span class="tok-q">"Content-Type: application/json"</span> \
   <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span> \
   <span class="tok-f">-d</span> <span class="tok-q">'{"status":"inactive"}'</span></pre>
         </div>
-
         <div class="codeblock">
-          <div class="codeblock-bar"><span class="badge DELETE" style="font-size:9.5px;padding:1px 7px">DELETE</span>&nbsp; Delete user</div>
+          <div class="codeblock-bar"><span class="badge DELETE" style="font-size:9.5px;padding:1px 7px">DELETE</span>&nbsp; Delete user — token required</div>
           <pre><span class="tok-cmd">curl</span> <span class="tok-f">-X DELETE</span> https://gorest.in/public/v2/users/1001 \
   <span class="tok-f">-H</span> <span class="tok-q">"Authorization: Bearer demo-token"</span></pre>
         </div>
-
       </div>
 
-      <!-- 06 STATUS CODES -->
+      <!-- 07 STATUS CODES -->
       <div class="sec" id="status">
-        <div class="sec-head">
-          <span class="sec-num">07</span>
-          <span class="sec-title">HTTP Status Codes</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">HTTP Status Codes</span></div>
         <div class="stat-wrap">
           <div class="stat-col">
-            <div class="stat-col-title">2xx &mdash; 3xx &nbsp; Success</div>
+            <div class="stat-col-title">2xx — 3xx &nbsp; Success</div>
             <div class="srow"><span class="scode s2">200</span><span class="sdesc">OK</span><span class="strig">GET / PUT / PATCH</span></div>
             <div class="srow"><span class="scode s2">201</span><span class="sdesc">Created</span><span class="strig">POST</span></div>
             <div class="srow"><span class="scode s2">204</span><span class="sdesc">No Content</span><span class="strig">DELETE</span></div>
             <div class="srow"><span class="scode s3">304</span><span class="sdesc">Not Modified</span><span class="strig">ETag cache hit</span></div>
           </div>
           <div class="stat-col">
-            <div class="stat-col-title">4xx &mdash; 5xx &nbsp; Errors</div>
+            <div class="stat-col-title">4xx — 5xx &nbsp; Errors</div>
             <div class="srow"><span class="scode s4">400</span><span class="sdesc">Bad Request</span><span class="strig">invalid JSON</span></div>
             <div class="srow"><span class="scode s4">401</span><span class="sdesc">Unauthorized</span><span class="strig">missing token</span></div>
             <div class="srow"><span class="scode s4">403</span><span class="sdesc">Forbidden</span><span class="strig">blocked-token</span></div>
@@ -791,31 +761,26 @@ body {
         </div>
       </div>
 
-      <!-- 07 RATE LIMITING -->
+      <!-- 08 RATE LIMITING -->
       <div class="sec" id="rate">
-        <div class="sec-head">
-          <span class="sec-num">08</span>
-          <span class="sec-title">Rate Limiting</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">08</span><span class="sec-title">Rate Limiting</span></div>
         <table class="ptable">
-          <tr><td>X-RateLimit-Limit</td><td>Max requests per minute &mdash; <strong>60</strong></td></tr>
-          <tr><td>X-RateLimit-Remaining</td><td>Requests left in the current window</td></tr>
+          <tr><td>X-RateLimit-Limit</td><td>Max requests allowed per minute — <strong>60</strong></td></tr>
+          <tr><td>X-RateLimit-Remaining</td><td>Requests remaining in the current window</td></tr>
           <tr><td>X-RateLimit-Reset</td><td>Seconds until the window resets</td></tr>
         </table>
       </div>
 
-      <!-- 08 NOTES -->
+      <!-- 09 NOTES -->
       <div class="sec" id="notes">
-        <div class="sec-head">
-          <span class="sec-num">09</span>
-          <span class="sec-title">Notes</span>
-        </div>
+        <div class="sec-head"><span class="sec-num">09</span><span class="sec-title">Notes</span></div>
         <table class="ptable">
-          <tr><td>Seed data</td><td>20 pre-loaded users, IDs 1001&ndash;1020. New users auto-increment from 1021.</td></tr>
-          <tr><td>Persistence</td><td>In-memory only &mdash; resets on server restart. Intentional; clean slate every session.</td></tr>
-          <tr><td>Duplicate email</td><td>Returns 422 with a field-level validation message.</td></tr>
+          <tr><td>Seed data</td><td>20 pre-loaded users, IDs 1001–1020. New users auto-increment from 1021.</td></tr>
+          <tr><td>Persistence</td><td>In-memory only — resets on server restart. Clean slate every session.</td></tr>
+          <tr><td>Duplicate email</td><td>Returns 422 with a field-level validation error message.</td></tr>
           <tr><td>Pagination headers</td><td><code>X-Pagination-Total</code> &nbsp;<code>X-Pagination-Pages</code> &nbsp;<code>X-Pagination-Page</code> &nbsp;<code>X-Pagination-Limit</code></td></tr>
-          <tr><td>Replaces</td><td>gorest.co.in &mdash; same URL structure, compatible with existing Postman collections.</td></tr>
+          <tr><td>XML support</td><td>Append <code>.xml</code> to any URL or send <code>Accept: application/xml</code> header.</td></tr>
+          <tr><td>Replaces</td><td>gorest.co.in — same URL structure, existing Postman collections work as-is.</td></tr>
         </table>
       </div>
 
@@ -826,8 +791,9 @@ body {
   <footer class="footer">
     <div class="footer-brand">Built for the QA community.</div>
     <div class="footer-links">
-      <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs &nearr;</a>
-      <a href="https://gorest.in/public/v2/users" target="_blank">Try the API &nearr;</a>
+      <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs ↗</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="https://gorest.in/public/v2/users" target="_blank">Try the API ↗</a>
       <span>Free forever</span>
     </div>
   </footer>
@@ -837,6 +803,140 @@ body {
 </html>`);
 
 
+});
+
+// ─── PRIVACY POLICY PAGE ─────────────────────────────────────────────────────
+app.get("/privacy", (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — GoRest.in</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%2311141c'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23e05c3a' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%2334d399'>.in</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Fraunces:ital,wght@0,800;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --bg2: #161b22; --bg3: #1c2230;
+  --border: #2a3344; --text: #e6edf3; --text2: #b0bec8; --text3: #6e7f8d;
+  --red: #e05c3a; --green: #34d399;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.7; -webkit-font-smoothing: antialiased; }
+.topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 9px 40px; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11.5px; color: var(--text3); }
+.topbar a { color: var(--text3); text-decoration: none; } .topbar a:hover { color: var(--text); }
+.topbar-brand { display: flex; align-items: center; gap: 16px; }
+.page { max-width: 720px; margin: 0 auto; padding: 64px 40px 96px; }
+.page-eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
+.page-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; line-height: 1; letter-spacing: -1px; color: var(--text); margin-bottom: 12px; }
+.page-meta { font-family: var(--mono); font-size: 12px; color: var(--text3); margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border); }
+.section { margin-bottom: 40px; }
+.section h2 { font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
+.section p { font-size: 14.5px; color: var(--text2); font-weight: 300; line-height: 1.8; margin-bottom: 12px; }
+.section p:last-child { margin-bottom: 0; }
+.section ul { list-style: none; padding: 0; }
+.section ul li { font-size: 14.5px; color: var(--text2); font-weight: 300; line-height: 1.8; padding: 4px 0 4px 16px; position: relative; }
+.section ul li::before { content: '→'; position: absolute; left: 0; color: var(--text3); font-family: var(--mono); }
+.section a { color: var(--green); text-decoration: none; border-bottom: 1px solid #1a5c42; }
+.section a:hover { border-color: var(--green); }
+.notice { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0; padding: 16px 20px; margin-bottom: 40px; }
+.notice p { font-size: 13.5px; color: var(--text2); font-weight: 300; }
+.footer { border-top: 1px solid var(--border); background: var(--bg2); padding: 20px 40px; text-align: center; font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.footer a { color: var(--text3); text-decoration: none; } .footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <a href="/" style="font-family:'Fraunces',serif;font-size:1.1rem;font-style:italic;color:var(--text)">GoRest.in</a>
+    <span style="color:var(--border)">|</span>
+    <span>Privacy Policy</span>
+  </div>
+  <a href="/">← Back to API Docs</a>
+</div>
+
+<div class="page">
+  <div class="page-eyebrow">Legal</div>
+  <h1 class="page-title">Privacy Policy</h1>
+  <div class="page-meta">Last updated: March 2026 &nbsp;·&nbsp; GoRest.in &nbsp;·&nbsp; Naveen AutomationLabs FZCO</div>
+
+  <div class="notice">
+    <p><strong style="color:var(--text)">Short version:</strong> GoRest.in is a free developer tool. We do not collect, store, or sell your personal data. The API stores data only in memory and resets on each server restart.</p>
+  </div>
+
+  <div class="section">
+    <h2>1. Who We Are</h2>
+    <p>GoRest.in is a free mock REST API service built and maintained by <strong style="color:var(--text)">Naveen AutomationLabs FZCO</strong>, a company registered in Dubai, UAE (DAFZA Free Zone, License #4949). The service is provided at <a href="https://gorest.in">https://gorest.in</a> for educational and testing purposes.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. What Data We Collect</h2>
+    <p>We collect minimal data to operate the service:</p>
+    <ul>
+      <li><strong style="color:var(--text)">Request logs:</strong> Standard web server logs (IP address, request path, HTTP method, timestamp, response code). These are used for debugging and rate limiting only.</li>
+      <li><strong style="color:var(--text)">API data you submit:</strong> User records (name, email, gender, status) sent via POST/PUT/PATCH are stored in-memory only and are permanently deleted on every server restart. We do not persist this data to any database.</li>
+      <li><strong style="color:var(--text)">No cookies:</strong> GoRest.in does not set any cookies or use browser storage.</li>
+      <li><strong style="color:var(--text)">No tracking:</strong> We do not use Google Analytics, Facebook Pixel, or any third-party tracking scripts.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>3. How We Use Data</h2>
+    <ul>
+      <li>To serve API responses to your requests</li>
+      <li>To enforce the rate limit (60 requests per minute per IP)</li>
+      <li>To debug issues and monitor service uptime</li>
+    </ul>
+    <p>We do not use your data for marketing, profiling, advertising, or any commercial purpose.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Data You Submit to the API</h2>
+    <p>Any data you POST to the API (names, emails, etc.) is stored in server memory only. It is not written to a database, not backed up, and is permanently erased when the server restarts. <strong style="color:var(--text)">Do not submit real personal data</strong> — this is a test API. Use fictional or dummy data only.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Third-Party Services</h2>
+    <ul>
+      <li><strong style="color:var(--text)">Vercel:</strong> GoRest.in is hosted on Vercel's infrastructure. Vercel may collect standard server logs. See <a href="https://vercel.com/legal/privacy-policy" target="_blank">Vercel's Privacy Policy ↗</a></li>
+      <li><strong style="color:var(--text)">Google Fonts:</strong> The documentation page loads fonts from Google Fonts CDN. See <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy ↗</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>6. Your Rights</h2>
+    <p>Since we do not store personal data persistently, there is no data to access, correct, or delete. If you have concerns about server-side request logs, you may contact us and we will address them within 30 days.</p>
+  </div>
+
+  <div class="section">
+    <h2>7. Children's Privacy</h2>
+    <p>GoRest.in is a developer tool intended for use by adults and students learning software testing. We do not knowingly collect data from children under 13.</p>
+  </div>
+
+  <div class="section">
+    <h2>8. Changes to This Policy</h2>
+    <p>We may update this policy from time to time. The "last updated" date at the top of this page reflects the most recent revision. Continued use of the service after changes constitutes acceptance of the updated policy.</p>
+  </div>
+
+  <div class="section">
+    <h2>9. Contact</h2>
+    <p>For privacy-related questions, reach out via the <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs YouTube channel ↗</a> or through LinkedIn.</p>
+    <p style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3)">Naveen AutomationLabs FZCO &nbsp;·&nbsp; DAFZA Free Zone, Dubai, UAE</p>
+  </div>
+</div>
+
+<footer class="footer">
+  <a href="/">← GoRest.in API Docs</a> &nbsp;·&nbsp;
+  <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs</a> &nbsp;·&nbsp;
+  Free forever
+</footer>
+
+</body>
+</html>`);
 });
 
 // ─── XML HELPERS ──────────────────────────────────────────────────────────────
