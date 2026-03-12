@@ -1,6 +1,6 @@
-# NAL Mock API 🚀
+# GoRest.in 🚀
 
-A free mock REST API for QA & SDET students — a drop-in replacement for GoRest.  
+A free mock REST API for QA & SDET students — a drop-in replacement for GoRest.co.in.  
 Built by **Naveen AutomationLabs**.
 
 🌐 **Live at: [https://gorest.in](https://gorest.in)**
@@ -8,8 +8,6 @@ Built by **Naveen AutomationLabs**.
 ---
 
 ## 🚀 Live API
-
-The API is publicly available at:
 
 ```
 https://gorest.in/public/v2/users
@@ -41,20 +39,77 @@ Authorization: Bearer <your-token>
 ```
 
 Any non-empty token is accepted. Use anything — `demo-token`, `abc123`, `naveen-rocks`.  
-Only `blocked-token` is rejected (triggers 403, useful for testing forbidden scenarios).
+Only `blocked-token` is rejected → triggers 403 (useful for testing forbidden scenarios).
 
 ---
 
 ## 📋 Endpoints
 
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|:---:|-------------|
+| Method | Endpoint | Auth | Description |
+|--------|----------|:----:|-------------|
 | GET | `/public/v2/users` | ❌ | List all users (paginated) |
 | POST | `/public/v2/users` | ✅ | Create a new user |
 | GET | `/public/v2/users/:id` | ❌ | Get user by ID |
 | PUT | `/public/v2/users/:id` | ✅ | Replace user (full update) |
 | PATCH | `/public/v2/users/:id` | ✅ | Update user (partial) |
 | DELETE | `/public/v2/users/:id` | ✅ | Delete user |
+
+---
+
+## 🔀 Response Format — JSON & XML
+
+The API supports both **JSON** (default) and **XML** responses.
+
+### Option 1 — Add `.xml` to the URL
+
+```bash
+GET https://gorest.in/public/v2/users.xml
+GET https://gorest.in/public/v2/users/1001.xml
+```
+
+### Option 2 — Use the `Accept` header
+
+```bash
+curl https://gorest.in/public/v2/users \
+  -H "Accept: application/xml"
+```
+
+### XML Response Example
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+  <user>
+    <id>1001</id>
+    <name>Aarav Sharma</name>
+    <email>aarav.sharma@example.com</email>
+    <gender>male</gender>
+    <status>active</status>
+  </user>
+</users>
+```
+
+### Single User XML
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<user>
+  <id>1001</id>
+  <name>Aarav Sharma</name>
+  <email>aarav.sharma@example.com</email>
+  <gender>male</gender>
+  <status>active</status>
+</user>
+```
+
+### Error XML (e.g. 404)
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<e>
+  <message>Resource not found</message>
+</e>
+```
 
 ---
 
@@ -82,9 +137,20 @@ Only `blocked-token` is rejected (triggers 403, useful for testing forbidden sce
 
 ## 🧪 Example Requests (curl)
 
-### GET all users — no token needed
+### GET all users — JSON (default)
 ```bash
 curl https://gorest.in/public/v2/users
+```
+
+### GET all users — XML via URL suffix
+```bash
+curl https://gorest.in/public/v2/users.xml
+```
+
+### GET all users — XML via Accept header
+```bash
+curl https://gorest.in/public/v2/users \
+  -H "Accept: application/xml"
 ```
 
 ### GET with filters and pagination
@@ -92,9 +158,14 @@ curl https://gorest.in/public/v2/users
 curl "https://gorest.in/public/v2/users?status=active&gender=male&page=1&per_page=5"
 ```
 
-### GET single user — no token needed
+### GET single user — JSON
 ```bash
 curl https://gorest.in/public/v2/users/1001
+```
+
+### GET single user — XML
+```bash
+curl https://gorest.in/public/v2/users/1001.xml
 ```
 
 ### POST — Create user (token required)
@@ -167,15 +238,15 @@ curl -X DELETE https://gorest.in/public/v2/users/1001 \
 
 | Code | Meaning | How to trigger |
 |------|---------|----------------|
-| `200` | OK | Any successful GET, PUT, PATCH |
+| `200` | OK | Successful GET, PUT, PATCH |
 | `201` | Created | Successful POST |
 | `204` | No Content | Successful DELETE |
-| `304` | Not Modified | GET with `If-None-Match` matching current ETag |
+| `304` | Not Modified | GET with matching `If-None-Match` ETag |
 | `400` | Bad Request | Send malformed/invalid JSON body |
-| `401` | Unauthorized | POST/PUT/PATCH/DELETE without `Authorization` header |
+| `401` | Unauthorized | Write operation without `Authorization` header |
 | `403` | Forbidden | Send `Authorization: Bearer blocked-token` |
 | `404` | Not Found | Request a non-existent user ID |
-| `405` | Method Not Allowed | e.g. `DELETE /public/v2/users` (missing ID) |
+| `405` | Method Not Allowed | e.g. `DELETE /public/v2/users` without ID |
 | `415` | Unsupported Media Type | POST without `Content-Type: application/json` |
 | `422` | Validation Failed | POST with blank/invalid fields |
 | `429` | Too Many Requests | Exceed 60 requests per minute |
@@ -195,6 +266,7 @@ The API comes pre-loaded with **20 users** (IDs 1001–1020). New users created 
 - Duplicate emails return a `422` validation error
 - Rate limit is **60 requests/minute per IP**
 - Use `blocked-token` to deliberately trigger a `403` response in tests
+- XML format works on all endpoints — use `.xml` suffix or `Accept: application/xml` header
 
 ---
 

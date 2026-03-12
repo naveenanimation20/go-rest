@@ -548,6 +548,7 @@ body {
         <span class="chip">Bearer Auth</span>
         <span class="chip">13 Status Codes</span>
         <span class="chip">Rate Limiting</span>
+        <span class="chip">JSON &amp; XML</span>
       </div>
     </div>
     <div class="hero-panel">
@@ -556,6 +557,7 @@ body {
       <div class="panel-stat"><span class="key">Seed users</span><span class="val">20 (IDs 1001–1020)</span></div>
       <div class="panel-stat"><span class="key">Rate limit</span><span class="val">60 req / min</span></div>
       <div class="panel-stat"><span class="key">Auth required</span><span class="val">POST / PUT / PATCH / DELETE</span></div>
+      <div class="panel-stat"><span class="key">Formats</span><span class="val">JSON &amp; XML</span></div>
       <div class="panel-stat"><span class="key">Replaces</span><span class="val">gorest.co.in</span></div>
       <div class="panel-stat"><span class="key">Built by</span><span class="val">Naveen AutomationLabs</span></div>
     </div>
@@ -571,6 +573,7 @@ body {
       <a href="#auth">Auth</a>
       <a href="#schema">Schema</a>
       <a href="#params">Query Params</a>
+      <a href="#format">JSON &amp; XML</a>
       <a href="#examples">cURL Examples</a>
       <a href="#status">Status Codes</a>
       <a href="#rate">Rate Limiting</a>
@@ -672,10 +675,51 @@ body {
         </table>
       </div>
 
-      <!-- 05 CURL -->
-      <div class="sec" id="examples">
+
+      <!-- 05 RESPONSE FORMAT -->
+      <div class="sec" id="format">
         <div class="sec-head">
           <span class="sec-num">05</span>
+          <span class="sec-title">Response Format — JSON &amp; XML</span>
+        </div>
+        <div class="callout" style="border-color: var(--blue);">
+          <p>All endpoints return <strong>JSON by default</strong>. To get XML, use either method below:</p>
+          <p><strong>Option 1 — URL suffix:</strong> append <code>.xml</code> to any endpoint URL.</p>
+          <p><strong>Option 2 — Accept header:</strong> send <code>Accept: application/xml</code> in your request headers.</p>
+        </div>
+        <div style="margin-top:16px">
+        <div class="codeblock">
+          <div class="codeblock-bar">URL suffix — collection</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users.xml</span></pre>
+        </div>
+        <div class="codeblock">
+          <div class="codeblock-bar">URL suffix — single user</div>
+          <pre><span class="tok-cmd">curl</span> <span class="tok-u">https://gorest.in/public/v2/users/1001.xml</span></pre>
+        </div>
+        <div class="codeblock">
+          <div class="codeblock-bar">Accept header</div>
+          <pre><span class="tok-cmd">curl</span> https://gorest.in/public/v2/users <span class="tok-f">-H</span> <span class="tok-q">"Accept: application/xml"</span></pre>
+        </div>
+        <div class="codeblock">
+          <div class="codeblock-bar">XML response — collection</div>
+          <pre><span class="tok-c">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="tok-k">&lt;users&gt;</span>
+  <span class="tok-k">&lt;user&gt;</span>
+    <span class="tok-k">&lt;id&gt;</span><span class="tok-n">1001</span><span class="tok-k">&lt;/id&gt;</span>
+    <span class="tok-k">&lt;n&gt;</span><span class="tok-s">Aarav Sharma</span><span class="tok-k">&lt;/n&gt;</span>
+    <span class="tok-k">&lt;email&gt;</span><span class="tok-s">aarav.sharma@example.com</span><span class="tok-k">&lt;/email&gt;</span>
+    <span class="tok-k">&lt;gender&gt;</span><span class="tok-s">male</span><span class="tok-k">&lt;/gender&gt;</span>
+    <span class="tok-k">&lt;status&gt;</span><span class="tok-s">active</span><span class="tok-k">&lt;/status&gt;</span>
+  <span class="tok-k">&lt;/user&gt;</span>
+<span class="tok-k">&lt;/users&gt;</span></pre>
+        </div>
+        </div>
+      </div>
+
+      <!-- 06 CURL -->
+      <div class="sec" id="examples">
+        <div class="sec-head">
+          <span class="sec-num">06</span>
           <span class="sec-title">cURL Examples</span>
         </div>
 
@@ -721,7 +765,7 @@ body {
       <!-- 06 STATUS CODES -->
       <div class="sec" id="status">
         <div class="sec-head">
-          <span class="sec-num">06</span>
+          <span class="sec-num">07</span>
           <span class="sec-title">HTTP Status Codes</span>
         </div>
         <div class="stat-wrap">
@@ -750,7 +794,7 @@ body {
       <!-- 07 RATE LIMITING -->
       <div class="sec" id="rate">
         <div class="sec-head">
-          <span class="sec-num">07</span>
+          <span class="sec-num">08</span>
           <span class="sec-title">Rate Limiting</span>
         </div>
         <table class="ptable">
@@ -763,7 +807,7 @@ body {
       <!-- 08 NOTES -->
       <div class="sec" id="notes">
         <div class="sec-head">
-          <span class="sec-num">08</span>
+          <span class="sec-num">09</span>
           <span class="sec-title">Notes</span>
         </div>
         <table class="ptable">
