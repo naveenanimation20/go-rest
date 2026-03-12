@@ -165,8 +165,8 @@ app.get("/", (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoRest.in — Free Mock REST API for QA & SDET</title>
-<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD. JSON & XML. No signup. Built by Naveen AutomationLabs.">
+<title>GoRest.in — Free REST API for QA & SDET</title>
+<meta name="description" content="Free REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD. JSON & XML. No signup. Built by Naveen AutomationLabs.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%2311141c'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23e05c3a' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%2334d399'>.in</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..500&display=swap" rel="stylesheet">
@@ -536,7 +536,7 @@ body {
   <!-- HERO -->
   <section class="hero">
     <div>
-      <h1 class="hero-title">Free<br><span class="italic">Mock</span><br>API.</h1>
+      <h1 class="hero-title">Free<br><span class="italic">Rest</span><br>APIs.</h1>
       <p class="hero-desc">A drop-in replacement for gorest.co.in — built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
       <div class="url-box">
         <span class="url-label">Base URL</span>
@@ -870,7 +870,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 
   <div class="section">
     <h2>1. Who We Are</h2>
-    <p>GoRest.in is a free mock REST API service built and maintained by <strong style="color:var(--text)">Naveen AutomationLabs FZCO</strong>, a company registered in Dubai, UAE (DAFZA Free Zone, License #4949). The service is provided at <a href="https://gorest.in">https://gorest.in</a> for educational and testing purposes.</p>
+    <p>GoRest.in is a free REST API service built and maintained by <strong style="color:var(--text)">Naveen AutomationLabs FZCO</strong>, a company registered in Dubai, UAE. The service is provided at <a href="https://gorest.in">https://gorest.in</a> for educational and testing purposes.</p>
   </div>
 
   <div class="section">
@@ -925,7 +925,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
   <div class="section">
     <h2>9. Contact</h2>
     <p>For privacy-related questions, reach out via the <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs YouTube channel ↗</a> or through LinkedIn.</p>
-    <p style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3)">Naveen AutomationLabs FZCO &nbsp;·&nbsp; DAFZA Free Zone, Dubai, UAE</p>
+    <p style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3)">Naveen Automation Labs</p>
   </div>
 </div>
 
