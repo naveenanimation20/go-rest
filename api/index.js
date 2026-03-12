@@ -165,8 +165,9 @@ app.get("/", (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoRest.in — Free REST API for QA & SDET</title>
-<meta name="description" content="Free REST API for QA and SDET students. Drop-in replacement for GoRest. No signup. Built by Naveen AutomationLabs.">
+<title>GoRest.in — Free Mock REST API for QA & SDET</title>
+<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. No signup. Built by Naveen AutomationLabs.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231a1612'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23c0392b' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%235fba7d'>.in</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Geist:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -523,7 +524,7 @@ body {
     <span class="live-dot"></span>
     API online
   </div>
-  <span>gorest.in &mdash; free REST API</span>
+  <span>gorest.in &mdash; free mock REST API</span>
 </div>
 
 <div class="wrap">
@@ -531,7 +532,7 @@ body {
   <!-- HERO -->
   <section class="hero">
     <div>
-      <h1 class="hero-title">Free<br><span class="italic">REST</span><br>APIs.</h1>
+      <h1 class="hero-title">Free<br><span class="italic">Mock</span><br>API.</h1>
       <p class="hero-subtitle">A drop-in replacement for gorest.co.in &mdash; built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
       <div class="url-box">
         <span class="url-label">Base URL</span>
@@ -553,6 +554,7 @@ body {
       <div class="panel-stat"><span class="key">Seed users</span><span class="val">20 (IDs 1001–1020)</span></div>
       <div class="panel-stat"><span class="key">Rate limit</span><span class="val">60 req / min</span></div>
       <div class="panel-stat"><span class="key">Auth required</span><span class="val">POST / PUT / PATCH / DELETE</span></div>
+      <div class="panel-stat"><span class="key">Replaces</span><span class="val">gorest.co.in</span></div>
       <div class="panel-stat"><span class="key">Built by</span><span class="val">Naveen AutomationLabs</span></div>
     </div>
   </section>
