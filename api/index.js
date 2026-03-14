@@ -573,7 +573,7 @@ body {
         <span class="chip">Free Forever</span>
       </div>
       <div class="postman-btns">
-        <a class="btn-postman" href="/postman-collection" download="GoRest.in.postman_collection.json">
+        <a class="btn-postman" href="/postman-collection?download=1">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Collection
         </a>
@@ -832,41 +832,30 @@ body {
 <script>
 function runInPostman(e) {
   e.preventDefault();
-  const collectionUrl = encodeURIComponent('https://gorest.in/postman-collection');
 
-  // Postman v10+ desktop deep link — opens collection import dialog directly
-  const desktopLink = 'postman://app/collections/import?collection_url=' + collectionUrl;
+  // Postman v10 desktop deep link — the ONLY format that works reliably
+  // collection_url must point to a public JSON endpoint (no Content-Disposition)
+  const collectionJsonUrl = 'https://gorest.in/postman-collection';
+  const deeplink = 'postman://app/collections/import?collection_url=' + encodeURIComponent(collectionJsonUrl);
 
-  // Detect if we're on desktop (not mobile) before attempting deep link
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (isMobile) { triggerDownload(); return; }
 
-  if (!isMobile) {
-    // Try desktop app first — create hidden iframe to avoid navigation
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
+  // Track if page loses focus (= Postman opened)
+  let postmanOpened = false;
+  const onBlur = () => { postmanOpened = true; };
+  window.addEventListener('blur', onBlur, { once: true });
 
-    let appOpened = false;
+  // Use location.href (not iframe) — some Postman versions ignore iframe triggers
+  window.location.href = deeplink;
 
-    // Listen for blur — if the app opens, window loses focus
-    const blurHandler = () => { appOpened = true; };
-    window.addEventListener('blur', blurHandler);
-
-    iframe.src = desktopLink;
-
-    // After 2.5s, if window never lost focus → Postman not installed → download instead
-    setTimeout(() => {
-      window.removeEventListener('blur', blurHandler);
-      document.body.removeChild(iframe);
-      if (!appOpened) {
-        // Postman not detected — fall back to download
-        triggerDownload();
-      }
-    }, 2500);
-  } else {
-    // Mobile: just download
-    triggerDownload();
-  }
+  setTimeout(() => {
+    window.removeEventListener('blur', onBlur);
+    if (!postmanOpened) {
+      // Postman not installed or didn't respond — fall back to file download
+      triggerDownload();
+    }
+  }, 3000);
 }
 
 function triggerDownload() {
@@ -900,7 +889,7 @@ function showToast(msg) {
 // ─── POSTMAN COLLECTION ───────────────────────────────────────────────────────
 const postmanCollection = {
   info: {
-    _postman_id: "gorest-in-collection-v1",
+    _postman_id: "9f3a1c2d-4b5e-6f7a-8b9c-0d1e2f3a4b5c",
     name: "GoRest.in — Mock REST API",
     description: "Free mock REST API for QA & SDET students. Drop-in replacement for gorest.co.in.\n\nBase URL: https://gorest.in/public/v2/users\n\nBuilt by Naveen AutomationLabs — https://www.youtube.com/@naveenAutomationLabs\n\nHow to use:\n- GET requests: no token needed\n- POST/PUT/PATCH/DELETE: any Bearer token works (e.g. demo-token)\n- Use 'blocked-token' to trigger 403 intentionally\n- Append .xml to any URL for XML responses",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -920,9 +909,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Returns a paginated list of all users. No token required.\n\nSupports query params: ?name= ?email= ?gender= ?status= ?page= ?per_page="
           },
@@ -934,9 +923,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users?page=1&per_page=10",
-              host: ["{{baseUrl}}"],
-              path: ["users"],
+              raw: "https://gorest.in/public/v2/users?page=1&per_page=10",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"],
               query: [
                 { key: "page",     value: "1" },
                 { key: "per_page", value: "10" }
@@ -952,9 +941,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users?status=active",
-              host: ["{{baseUrl}}"],
-              path: ["users"],
+              raw: "https://gorest.in/public/v2/users?status=active",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"],
               query: [
                 { key: "status", value: "active" }
               ]
@@ -969,9 +958,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users?gender=male",
-              host: ["{{baseUrl}}"],
-              path: ["users"],
+              raw: "https://gorest.in/public/v2/users?gender=male",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"],
               query: [
                 { key: "gender", value: "male" }
               ]
@@ -988,9 +977,9 @@ const postmanCollection = {
               { key: "Accept", value: "application/xml", type: "text" }
             ],
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Returns users in XML format using Accept header.\n\nAlternatively, use URL suffix: GET {{baseUrl}}/users.xml"
           },
@@ -1002,9 +991,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users.xml",
-              host: ["{{baseUrl}}"],
-              path: ["users.xml"]
+              raw: "https://gorest.in/public/v2/users.xml",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users.xml"]
             },
             description: "Returns all users in XML by appending .xml to the URL."
           },
@@ -1016,9 +1005,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users/{{userId}}",
-              host: ["{{baseUrl}}"],
-              path: ["users", "{{userId}}"]
+              raw: "https://gorest.in/public/v2/users/{{userId}}",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "{{userId}}"]
             },
             description: "Fetch a single user by ID. No token required.\n\nReturns 404 if ID does not exist."
           },
@@ -1030,9 +1019,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users/{{userId}}.xml",
-              host: ["{{baseUrl}}"],
-              path: ["users", "{{userId}}.xml"]
+              raw: "https://gorest.in/public/v2/users/{{userId}}.xml",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "{{userId}}.xml"]
             },
             description: "Returns a single user in XML format via URL suffix."
           },
@@ -1057,9 +1046,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Creates a new user. Token required.\n\nRequired fields:\n- name (string)\n- email (string, unique)\n- gender (male | female)\n- status (active | inactive)\n\nReturns 201 on success, 422 on validation failure."
           },
@@ -1084,9 +1073,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users/{{userId}}",
-              host: ["{{baseUrl}}"],
-              path: ["users", "{{userId}}"]
+              raw: "https://gorest.in/public/v2/users/{{userId}}",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "{{userId}}"]
             },
             description: "Full replace of a user record. All fields required. Token required.\n\nReturns 200 on success, 404 if user not found, 422 on validation failure."
           },
@@ -1106,9 +1095,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users/{{userId}}",
-              host: ["{{baseUrl}}"],
-              path: ["users", "{{userId}}"]
+              raw: "https://gorest.in/public/v2/users/{{userId}}",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "{{userId}}"]
             },
             description: "Partial update — only send the fields you want to change. Token required.\n\nReturns 200 on success, 404 if user not found."
           },
@@ -1122,9 +1111,9 @@ const postmanCollection = {
               { key: "Authorization", value: "Bearer {{token}}", type: "text" }
             ],
             url: {
-              raw: "{{baseUrl}}/users/{{userId}}",
-              host: ["{{baseUrl}}"],
-              path: ["users", "{{userId}}"]
+              raw: "https://gorest.in/public/v2/users/{{userId}}",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "{{userId}}"]
             },
             description: "Permanently deletes a user. Token required.\n\nReturns 204 No Content on success, 404 if user not found."
           },
@@ -1148,9 +1137,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "No Authorization header → 401 Unauthorized"
           },
@@ -1170,9 +1159,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Using 'blocked-token' deliberately returns 403 Forbidden — useful for testing forbidden error handling."
           },
@@ -1184,9 +1173,9 @@ const postmanCollection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/users/99999",
-              host: ["{{baseUrl}}"],
-              path: ["users", "99999"]
+              raw: "https://gorest.in/public/v2/users/99999",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users", "99999"]
             },
             description: "Non-existent user ID → 404 Not Found"
           },
@@ -1200,9 +1189,9 @@ const postmanCollection = {
               { key: "Authorization", value: "Bearer {{token}}", type: "text" }
             ],
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "DELETE on collection endpoint (no ID) → 405 Method Not Allowed"
           },
@@ -1220,9 +1209,9 @@ const postmanCollection = {
               raw: JSON.stringify({ name: "Test", email: "t@test.com", gender: "male", status: "active" }, null, 2)
             },
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "POST without Content-Type: application/json → 415 Unsupported Media Type"
           },
@@ -1242,9 +1231,9 @@ const postmanCollection = {
               options: { raw: { language: "json" } }
             },
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Invalid field values → 422 Validation Failed with field-level errors"
           },
@@ -1258,9 +1247,9 @@ const postmanCollection = {
               { key: "If-None-Match", value: "fetch-first-then-paste-etag-here", type: "text" }
             ],
             url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
+              raw: "https://gorest.in/public/v2/users",
+              host: ["gorest.in"],
+              path: ["public", "v2", "users"]
             },
             description: "Step 1: Make a normal GET /users and copy the ETag response header value.\nStep 2: Paste it as the If-None-Match header value here.\nStep 3: Run — returns 304 Not Modified (empty body)."
           },
@@ -1272,8 +1261,13 @@ const postmanCollection = {
 };
 
 app.get("/postman-collection", (req, res) => {
+  // No Content-Disposition — Postman must fetch this as plain JSON for import
+  // ?download=1 triggers file download for browsers
+  if (req.query.download === "1") {
+    res.setHeader("Content-Disposition", 'attachment; filename="GoRest.in.postman_collection.json"');
+  }
   res.setHeader("Content-Type", "application/json");
-  res.setHeader("Content-Disposition", 'attachment; filename="GoRest.in.postman_collection.json"');
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.status(200).json(postmanCollection);
 });
 
@@ -1411,41 +1405,30 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 <script>
 function runInPostman(e) {
   e.preventDefault();
-  const collectionUrl = encodeURIComponent('https://gorest.in/postman-collection');
 
-  // Postman v10+ desktop deep link — opens collection import dialog directly
-  const desktopLink = 'postman://app/collections/import?collection_url=' + collectionUrl;
+  // Postman v10 desktop deep link — the ONLY format that works reliably
+  // collection_url must point to a public JSON endpoint (no Content-Disposition)
+  const collectionJsonUrl = 'https://gorest.in/postman-collection';
+  const deeplink = 'postman://app/collections/import?collection_url=' + encodeURIComponent(collectionJsonUrl);
 
-  // Detect if we're on desktop (not mobile) before attempting deep link
   const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (isMobile) { triggerDownload(); return; }
 
-  if (!isMobile) {
-    // Try desktop app first — create hidden iframe to avoid navigation
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
+  // Track if page loses focus (= Postman opened)
+  let postmanOpened = false;
+  const onBlur = () => { postmanOpened = true; };
+  window.addEventListener('blur', onBlur, { once: true });
 
-    let appOpened = false;
+  // Use location.href (not iframe) — some Postman versions ignore iframe triggers
+  window.location.href = deeplink;
 
-    // Listen for blur — if the app opens, window loses focus
-    const blurHandler = () => { appOpened = true; };
-    window.addEventListener('blur', blurHandler);
-
-    iframe.src = desktopLink;
-
-    // After 2.5s, if window never lost focus → Postman not installed → download instead
-    setTimeout(() => {
-      window.removeEventListener('blur', blurHandler);
-      document.body.removeChild(iframe);
-      if (!appOpened) {
-        // Postman not detected — fall back to download
-        triggerDownload();
-      }
-    }, 2500);
-  } else {
-    // Mobile: just download
-    triggerDownload();
-  }
+  setTimeout(() => {
+    window.removeEventListener('blur', onBlur);
+    if (!postmanOpened) {
+      // Postman not installed or didn't respond — fall back to file download
+      triggerDownload();
+    }
+  }, 3000);
 }
 
 function triggerDownload() {
