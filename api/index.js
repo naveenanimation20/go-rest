@@ -165,8 +165,8 @@ app.get("/", (req, res) => {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GoRest.in — Free REST API for QA & SDET</title>
-<meta name="description" content="Free REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD. JSON & XML. No signup. Built by Naveen AutomationLabs.">
+<title>GoRest.in — Free Mock REST API for QA & SDET</title>
+<meta name="description" content="Free mock REST API for QA and SDET students. Drop-in replacement for GoRest. Full CRUD. JSON & XML. No signup. Built by Naveen AutomationLabs.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%2311141c'/><text y='72' x='50' text-anchor='middle' font-size='62' font-family='Georgia,serif' fill='%23e05c3a' font-style='italic'>G</text><text y='88' x='68' text-anchor='middle' font-size='22' font-family='monospace' fill='%2334d399'>.in</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=Fraunces:ital,wght@0,800;0,900;1,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..500&display=swap" rel="stylesheet">
@@ -289,6 +289,26 @@ body {
   padding: 4px 10px;
   background: var(--bg2);
 }
+.postman-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.btn-postman {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .3px;
+  padding: 9px 18px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all .15s;
+  background: #ff6c37;
+  color: #fff;
+  border: 1px solid #e55a28;
+}
+.btn-postman:hover { background: #e55a28; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,108,55,.3); }
+.btn-postman.btn-open { background: transparent; color: #ff6c37; border: 1px solid #ff6c37; }
+.btn-postman.btn-open:hover { background: rgba(255,108,55,.1); }
 
 /* hero right panel */
 .hero-panel {
@@ -536,7 +556,7 @@ body {
   <!-- HERO -->
   <section class="hero">
     <div>
-      <h1 class="hero-title">Free<br><span class="italic">Rest</span><br>APIs.</h1>
+      <h1 class="hero-title">Free<br><span class="italic">Mock</span><br>API.</h1>
       <p class="hero-desc">A drop-in replacement for gorest.co.in — built for QA &amp; SDET students who need a reliable endpoint to test against. Full CRUD. Real HTTP responses. No account required.</p>
       <div class="url-box">
         <span class="url-label">Base URL</span>
@@ -551,6 +571,16 @@ body {
         <span class="chip">13 Status Codes</span>
         <span class="chip">Rate Limiting</span>
         <span class="chip">Free Forever</span>
+      </div>
+      <div class="postman-btns">
+        <a class="btn-postman" href="/postman-collection" download="GoRest.in.postman_collection.json">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Collection
+        </a>
+        <a class="btn-postman btn-open" href="https://app.getpostman.com/run-collection/gorest-in#?env%5BGoRest.in%5D=W3sia2V5IjoiYmFzZVVybCIsInZhbHVlIjoiaHR0cHM6Ly9nb3Jlc3QuaW4vcHVibGljL3YyIiwidHlwZSI6InN0cmluZyIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoidG9rZW4iLCJ2YWx1ZSI6ImRlbW8tdG9rZW4iLCJ0eXBlIjoic3RyaW5nIiwiZW5hYmxlZCI6dHJ1ZX0seyJrZXkiOiJ1c2VySWQiLCJ2YWx1ZSI6IjEwMDEiLCJ0eXBlIjoic3RyaW5nIiwiZW5hYmxlZCI6dHJ1ZX1d" target="_blank" onclick="tryPostmanDeeplink(event, this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          Run in Postman
+        </a>
       </div>
     </div>
     <div class="hero-panel">
@@ -799,11 +829,405 @@ body {
   </footer>
 
 </div>
+<script>
+function tryPostmanDeeplink(e, el) {
+  e.preventDefault();
+  // Try Postman desktop deep link first
+  const deeplink = 'postman://app/collections/import?url=' + encodeURIComponent(window.location.origin + '/postman-collection');
+  window.location.href = deeplink;
+  // Fall back to download after 2.5s if Postman isn't installed
+  setTimeout(() => {
+    window.open('/postman-collection', '_blank');
+  }, 2500);
+}
+</script>
 </body>
 </html>`);
 
 
 });
+
+
+// ─── POSTMAN COLLECTION ───────────────────────────────────────────────────────
+const postmanCollection = {
+  info: {
+    _postman_id: "gorest-in-collection-v1",
+    name: "GoRest.in — Mock REST API",
+    description: "Free mock REST API for QA & SDET students. Drop-in replacement for gorest.co.in.\n\nBase URL: https://gorest.in/public/v2/users\n\nBuilt by Naveen AutomationLabs — https://www.youtube.com/@naveenAutomationLabs\n\nHow to use:\n- GET requests: no token needed\n- POST/PUT/PATCH/DELETE: any Bearer token works (e.g. demo-token)\n- Use 'blocked-token' to trigger 403 intentionally\n- Append .xml to any URL for XML responses",
+    schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  variable: [
+    { key: "baseUrl", value: "https://gorest.in/public/v2", type: "string" },
+    { key: "token",   value: "demo-token",                  type: "string" },
+    { key: "userId",  value: "1001",                        type: "string" }
+  ],
+  item: [
+    {
+      name: "Users",
+      item: [
+        {
+          name: "GET All Users",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Returns a paginated list of all users. No token required.\n\nSupports query params: ?name= ?email= ?gender= ?status= ?page= ?per_page="
+          },
+          response: []
+        },
+        {
+          name: "GET All Users — Paginated",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users?page=1&per_page=10",
+              host: ["{{baseUrl}}"],
+              path: ["users"],
+              query: [
+                { key: "page",     value: "1" },
+                { key: "per_page", value: "10" }
+              ]
+            },
+            description: "Paginated request. Default per_page is 10, max is 100."
+          },
+          response: []
+        },
+        {
+          name: "GET All Users — Filter by Status",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users?status=active",
+              host: ["{{baseUrl}}"],
+              path: ["users"],
+              query: [
+                { key: "status", value: "active" }
+              ]
+            },
+            description: "Filter users by status. Values: active | inactive"
+          },
+          response: []
+        },
+        {
+          name: "GET All Users — Filter by Gender",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users?gender=male",
+              host: ["{{baseUrl}}"],
+              path: ["users"],
+              query: [
+                { key: "gender", value: "male" }
+              ]
+            },
+            description: "Filter users by gender. Values: male | female"
+          },
+          response: []
+        },
+        {
+          name: "GET All Users — XML Response",
+          request: {
+            method: "GET",
+            header: [
+              { key: "Accept", value: "application/xml", type: "text" }
+            ],
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Returns users in XML format using Accept header.\n\nAlternatively, use URL suffix: GET {{baseUrl}}/users.xml"
+          },
+          response: []
+        },
+        {
+          name: "GET All Users — XML via URL Suffix",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users.xml",
+              host: ["{{baseUrl}}"],
+              path: ["users.xml"]
+            },
+            description: "Returns all users in XML by appending .xml to the URL."
+          },
+          response: []
+        },
+        {
+          name: "GET Single User by ID",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users/{{userId}}",
+              host: ["{{baseUrl}}"],
+              path: ["users", "{{userId}}"]
+            },
+            description: "Fetch a single user by ID. No token required.\n\nReturns 404 if ID does not exist."
+          },
+          response: []
+        },
+        {
+          name: "GET Single User — XML",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users/{{userId}}.xml",
+              host: ["{{baseUrl}}"],
+              path: ["users", "{{userId}}.xml"]
+            },
+            description: "Returns a single user in XML format via URL suffix."
+          },
+          response: []
+        },
+        {
+          name: "POST Create User",
+          request: {
+            method: "POST",
+            header: [
+              { key: "Content-Type",  value: "application/json",      type: "text" },
+              { key: "Authorization", value: "Bearer {{token}}",       type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                name:   "Naveen Kumar",
+                email:  "naveen.kumar@example.com",
+                gender: "male",
+                status: "active"
+              }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Creates a new user. Token required.\n\nRequired fields:\n- name (string)\n- email (string, unique)\n- gender (male | female)\n- status (active | inactive)\n\nReturns 201 on success, 422 on validation failure."
+          },
+          response: []
+        },
+        {
+          name: "PUT Full Update User",
+          request: {
+            method: "PUT",
+            header: [
+              { key: "Content-Type",  value: "application/json", type: "text" },
+              { key: "Authorization", value: "Bearer {{token}}",  type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                name:   "Naveen Kumar Updated",
+                email:  "naveen.updated@example.com",
+                gender: "male",
+                status: "inactive"
+              }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users/{{userId}}",
+              host: ["{{baseUrl}}"],
+              path: ["users", "{{userId}}"]
+            },
+            description: "Full replace of a user record. All fields required. Token required.\n\nReturns 200 on success, 404 if user not found, 422 on validation failure."
+          },
+          response: []
+        },
+        {
+          name: "PATCH Partial Update User",
+          request: {
+            method: "PATCH",
+            header: [
+              { key: "Content-Type",  value: "application/json", type: "text" },
+              { key: "Authorization", value: "Bearer {{token}}",  type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({ status: "inactive" }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users/{{userId}}",
+              host: ["{{baseUrl}}"],
+              path: ["users", "{{userId}}"]
+            },
+            description: "Partial update — only send the fields you want to change. Token required.\n\nReturns 200 on success, 404 if user not found."
+          },
+          response: []
+        },
+        {
+          name: "DELETE User",
+          request: {
+            method: "DELETE",
+            header: [
+              { key: "Authorization", value: "Bearer {{token}}", type: "text" }
+            ],
+            url: {
+              raw: "{{baseUrl}}/users/{{userId}}",
+              host: ["{{baseUrl}}"],
+              path: ["users", "{{userId}}"]
+            },
+            description: "Permanently deletes a user. Token required.\n\nReturns 204 No Content on success, 404 if user not found."
+          },
+          response: []
+        }
+      ]
+    },
+    {
+      name: "Status Code Scenarios",
+      item: [
+        {
+          name: "401 — Missing Token",
+          request: {
+            method: "POST",
+            header: [
+              { key: "Content-Type", value: "application/json", type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({ name: "Test", email: "t@test.com", gender: "male", status: "active" }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "No Authorization header → 401 Unauthorized"
+          },
+          response: []
+        },
+        {
+          name: "403 — Blocked Token",
+          request: {
+            method: "POST",
+            header: [
+              { key: "Content-Type",  value: "application/json",  type: "text" },
+              { key: "Authorization", value: "Bearer blocked-token", type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({ name: "Test", email: "t@test.com", gender: "male", status: "active" }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Using 'blocked-token' deliberately returns 403 Forbidden — useful for testing forbidden error handling."
+          },
+          response: []
+        },
+        {
+          name: "404 — User Not Found",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/users/99999",
+              host: ["{{baseUrl}}"],
+              path: ["users", "99999"]
+            },
+            description: "Non-existent user ID → 404 Not Found"
+          },
+          response: []
+        },
+        {
+          name: "405 — Method Not Allowed",
+          request: {
+            method: "DELETE",
+            header: [
+              { key: "Authorization", value: "Bearer {{token}}", type: "text" }
+            ],
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "DELETE on collection endpoint (no ID) → 405 Method Not Allowed"
+          },
+          response: []
+        },
+        {
+          name: "415 — Missing Content-Type",
+          request: {
+            method: "POST",
+            header: [
+              { key: "Authorization", value: "Bearer {{token}}", type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({ name: "Test", email: "t@test.com", gender: "male", status: "active" }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "POST without Content-Type: application/json → 415 Unsupported Media Type"
+          },
+          response: []
+        },
+        {
+          name: "422 — Validation Failed",
+          request: {
+            method: "POST",
+            header: [
+              { key: "Content-Type",  value: "application/json", type: "text" },
+              { key: "Authorization", value: "Bearer {{token}}",  type: "text" }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({ name: "", email: "not-an-email", gender: "unknown", status: "active" }, null, 2),
+              options: { raw: { language: "json" } }
+            },
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Invalid field values → 422 Validation Failed with field-level errors"
+          },
+          response: []
+        },
+        {
+          name: "304 — Not Modified (ETag)",
+          request: {
+            method: "GET",
+            header: [
+              { key: "If-None-Match", value: "fetch-first-then-paste-etag-here", type: "text" }
+            ],
+            url: {
+              raw: "{{baseUrl}}/users",
+              host: ["{{baseUrl}}"],
+              path: ["users"]
+            },
+            description: "Step 1: Make a normal GET /users and copy the ETag response header value.\nStep 2: Paste it as the If-None-Match header value here.\nStep 3: Run — returns 304 Not Modified (empty body)."
+          },
+          response: []
+        }
+      ]
+    }
+  ]
+};
+
+app.get("/postman-collection", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Disposition", 'attachment; filename="GoRest.in.postman_collection.json"');
+  res.status(200).json(postmanCollection);
+});
+
 
 // ─── PRIVACY POLICY PAGE ─────────────────────────────────────────────────────
 app.get("/privacy", (req, res) => {
@@ -870,7 +1294,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 
   <div class="section">
     <h2>1. Who We Are</h2>
-    <p>GoRest.in is a free REST API service built and maintained by <strong style="color:var(--text)">Naveen AutomationLabs FZCO</strong>, a company registered in Dubai, UAE. The service is provided at <a href="https://gorest.in">https://gorest.in</a> for educational and testing purposes.</p>
+    <p>GoRest.in is a free mock REST API service built and maintained by <strong style="color:var(--text)">Naveen AutomationLabs FZCO</strong>, a company registered in Dubai, UAE (DAFZA Free Zone, License #4949). The service is provided at <a href="https://gorest.in">https://gorest.in</a> for educational and testing purposes.</p>
   </div>
 
   <div class="section">
@@ -925,7 +1349,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
   <div class="section">
     <h2>9. Contact</h2>
     <p>For privacy-related questions, reach out via the <a href="https://www.youtube.com/@naveenAutomationLabs" target="_blank">Naveen AutomationLabs YouTube channel ↗</a> or through LinkedIn.</p>
-    <p style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3)">Naveen Automation Labs</p>
+    <p style="margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--text3)">Naveen AutomationLabs FZCO &nbsp;·&nbsp; DAFZA Free Zone, Dubai, UAE</p>
   </div>
 </div>
 
@@ -935,6 +1359,18 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
   Free forever
 </footer>
 
+<script>
+function tryPostmanDeeplink(e, el) {
+  e.preventDefault();
+  // Try Postman desktop deep link first
+  const deeplink = 'postman://app/collections/import?url=' + encodeURIComponent(window.location.origin + '/postman-collection');
+  window.location.href = deeplink;
+  // Fall back to download after 2.5s if Postman isn't installed
+  setTimeout(() => {
+    window.open('/postman-collection', '_blank');
+  }, 2500);
+}
+</script>
 </body>
 </html>`);
 });
