@@ -577,8 +577,8 @@ body {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download Collection
         </a>
-        <a class="btn-postman btn-open" href="https://app.getpostman.com/run-collection/gorest-in#?env%5BGoRest.in%5D=W3sia2V5IjoiYmFzZVVybCIsInZhbHVlIjoiaHR0cHM6Ly9nb3Jlc3QuaW4vcHVibGljL3YyIiwidHlwZSI6InN0cmluZyIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoidG9rZW4iLCJ2YWx1ZSI6ImRlbW8tdG9rZW4iLCJ0eXBlIjoic3RyaW5nIiwiZW5hYmxlZCI6dHJ1ZX0seyJrZXkiOiJ1c2VySWQiLCJ2YWx1ZSI6IjEwMDEiLCJ0eXBlIjoic3RyaW5nIiwiZW5hYmxlZCI6dHJ1ZX1d" target="_blank" onclick="tryPostmanDeeplink(event, this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <a class="btn-postman btn-open" href="#" onclick="runInPostman(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="10 8 16 12 10 16 10 8"/></svg>
           Run in Postman
         </a>
       </div>
@@ -830,15 +830,64 @@ body {
 
 </div>
 <script>
-function tryPostmanDeeplink(e, el) {
+function runInPostman(e) {
   e.preventDefault();
-  // Try Postman desktop deep link first
-  const deeplink = 'postman://app/collections/import?url=' + encodeURIComponent(window.location.origin + '/postman-collection');
-  window.location.href = deeplink;
-  // Fall back to download after 2.5s if Postman isn't installed
-  setTimeout(() => {
-    window.open('/postman-collection', '_blank');
-  }, 2500);
+  const collectionUrl = encodeURIComponent('https://gorest.in/postman-collection');
+
+  // Postman v10+ desktop deep link — opens collection import dialog directly
+  const desktopLink = 'postman://app/collections/import?collection_url=' + collectionUrl;
+
+  // Detect if we're on desktop (not mobile) before attempting deep link
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  if (!isMobile) {
+    // Try desktop app first — create hidden iframe to avoid navigation
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    let appOpened = false;
+
+    // Listen for blur — if the app opens, window loses focus
+    const blurHandler = () => { appOpened = true; };
+    window.addEventListener('blur', blurHandler);
+
+    iframe.src = desktopLink;
+
+    // After 2.5s, if window never lost focus → Postman not installed → download instead
+    setTimeout(() => {
+      window.removeEventListener('blur', blurHandler);
+      document.body.removeChild(iframe);
+      if (!appOpened) {
+        // Postman not detected — fall back to download
+        triggerDownload();
+      }
+    }, 2500);
+  } else {
+    // Mobile: just download
+    triggerDownload();
+  }
+}
+
+function triggerDownload() {
+  const a = document.createElement('a');
+  a.href = '/postman-collection';
+  a.download = 'GoRest.in.postman_collection.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // Show a small toast hint
+  showToast('Postman not detected — collection downloaded instead. Import via File → Import in Postman.');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2230;border:1px solid #2a3344;color:#b0bec8;font-family:IBM Plex Mono,monospace;font-size:12px;padding:12px 20px;border-radius:6px;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 3500);
+  setTimeout(() => document.body.removeChild(t), 4000);
+  t.style.transition = 'opacity .5s';
 }
 </script>
 </body>
@@ -1360,15 +1409,64 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 </footer>
 
 <script>
-function tryPostmanDeeplink(e, el) {
+function runInPostman(e) {
   e.preventDefault();
-  // Try Postman desktop deep link first
-  const deeplink = 'postman://app/collections/import?url=' + encodeURIComponent(window.location.origin + '/postman-collection');
-  window.location.href = deeplink;
-  // Fall back to download after 2.5s if Postman isn't installed
-  setTimeout(() => {
-    window.open('/postman-collection', '_blank');
-  }, 2500);
+  const collectionUrl = encodeURIComponent('https://gorest.in/postman-collection');
+
+  // Postman v10+ desktop deep link — opens collection import dialog directly
+  const desktopLink = 'postman://app/collections/import?collection_url=' + collectionUrl;
+
+  // Detect if we're on desktop (not mobile) before attempting deep link
+  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  if (!isMobile) {
+    // Try desktop app first — create hidden iframe to avoid navigation
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+
+    let appOpened = false;
+
+    // Listen for blur — if the app opens, window loses focus
+    const blurHandler = () => { appOpened = true; };
+    window.addEventListener('blur', blurHandler);
+
+    iframe.src = desktopLink;
+
+    // After 2.5s, if window never lost focus → Postman not installed → download instead
+    setTimeout(() => {
+      window.removeEventListener('blur', blurHandler);
+      document.body.removeChild(iframe);
+      if (!appOpened) {
+        // Postman not detected — fall back to download
+        triggerDownload();
+      }
+    }, 2500);
+  } else {
+    // Mobile: just download
+    triggerDownload();
+  }
+}
+
+function triggerDownload() {
+  const a = document.createElement('a');
+  a.href = '/postman-collection';
+  a.download = 'GoRest.in.postman_collection.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // Show a small toast hint
+  showToast('Postman not detected — collection downloaded instead. Import via File → Import in Postman.');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2230;border:1px solid #2a3344;color:#b0bec8;font-family:IBM Plex Mono,monospace;font-size:12px;padding:12px 20px;border-radius:6px;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4);';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 3500);
+  setTimeout(() => document.body.removeChild(t), 4000);
+  t.style.transition = 'opacity .5s';
 }
 </script>
 </body>
