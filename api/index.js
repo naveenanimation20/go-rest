@@ -307,8 +307,6 @@ body {
   border: 1px solid #e55a28;
 }
 .btn-postman:hover { background: #e55a28; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,108,55,.3); }
-.btn-postman.btn-open { background: transparent; color: #ff6c37; border: 1px solid #ff6c37; }
-.btn-postman.btn-open:hover { background: rgba(255,108,55,.1); }
 
 /* hero right panel */
 .hero-panel {
@@ -575,11 +573,7 @@ body {
       <div class="postman-btns">
         <a class="btn-postman" href="/postman-collection?download=1">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download Collection
-        </a>
-        <a class="btn-postman btn-open" href="#" onclick="runInPostman(event)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="10 8 16 12 10 16 10 8"/></svg>
-          Run in Postman
+          Download Postman Collection
         </a>
       </div>
     </div>
@@ -829,56 +823,7 @@ body {
   </footer>
 
 </div>
-<script>
-function runInPostman(e) {
-  e.preventDefault();
 
-  // Postman v10 desktop deep link — the ONLY format that works reliably
-  // collection_url must point to a public JSON endpoint (no Content-Disposition)
-  const collectionJsonUrl = 'https://gorest.in/postman-collection';
-  const deeplink = 'postman://app/collections/import?collection_url=' + encodeURIComponent(collectionJsonUrl);
-
-  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-  if (isMobile) { triggerDownload(); return; }
-
-  // Track if page loses focus (= Postman opened)
-  let postmanOpened = false;
-  const onBlur = () => { postmanOpened = true; };
-  window.addEventListener('blur', onBlur, { once: true });
-
-  // Use location.href (not iframe) — some Postman versions ignore iframe triggers
-  window.location.href = deeplink;
-
-  setTimeout(() => {
-    window.removeEventListener('blur', onBlur);
-    if (!postmanOpened) {
-      // Postman not installed or didn't respond — fall back to file download
-      triggerDownload();
-    }
-  }, 3000);
-}
-
-function triggerDownload() {
-  const a = document.createElement('a');
-  a.href = '/postman-collection';
-  a.download = 'GoRest.in.postman_collection.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Show a small toast hint
-  showToast('Postman not detected — collection downloaded instead. Import via File → Import in Postman.');
-}
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2230;border:1px solid #2a3344;color:#b0bec8;font-family:IBM Plex Mono,monospace;font-size:12px;padding:12px 20px;border-radius:6px;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.style.opacity = '0', 3500);
-  setTimeout(() => document.body.removeChild(t), 4000);
-  t.style.transition = 'opacity .5s';
-}
-</script>
 </body>
 </html>`);
 
@@ -1402,56 +1347,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
   Free forever
 </footer>
 
-<script>
-function runInPostman(e) {
-  e.preventDefault();
 
-  // Postman v10 desktop deep link — the ONLY format that works reliably
-  // collection_url must point to a public JSON endpoint (no Content-Disposition)
-  const collectionJsonUrl = 'https://gorest.in/postman-collection';
-  const deeplink = 'postman://app/collections/import?collection_url=' + encodeURIComponent(collectionJsonUrl);
-
-  const isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
-  if (isMobile) { triggerDownload(); return; }
-
-  // Track if page loses focus (= Postman opened)
-  let postmanOpened = false;
-  const onBlur = () => { postmanOpened = true; };
-  window.addEventListener('blur', onBlur, { once: true });
-
-  // Use location.href (not iframe) — some Postman versions ignore iframe triggers
-  window.location.href = deeplink;
-
-  setTimeout(() => {
-    window.removeEventListener('blur', onBlur);
-    if (!postmanOpened) {
-      // Postman not installed or didn't respond — fall back to file download
-      triggerDownload();
-    }
-  }, 3000);
-}
-
-function triggerDownload() {
-  const a = document.createElement('a');
-  a.href = '/postman-collection';
-  a.download = 'GoRest.in.postman_collection.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Show a small toast hint
-  showToast('Postman not detected — collection downloaded instead. Import via File → Import in Postman.');
-}
-
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c2230;border:1px solid #2a3344;color:#b0bec8;font-family:IBM Plex Mono,monospace;font-size:12px;padding:12px 20px;border-radius:6px;z-index:9999;max-width:90vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.4);';
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.style.opacity = '0', 3500);
-  setTimeout(() => document.body.removeChild(t), 4000);
-  t.style.transition = 'opacity .5s';
-}
-</script>
 </body>
 </html>`);
 });
