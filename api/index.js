@@ -1213,6 +1213,349 @@ function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+<script>
+var BASE = 'https://gorest.in';
+var PRESETS = {
+  GET:[
+    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
+    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
+    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
+    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
+    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''}
+  ],
+  POST:[{label:'Create user', path:'/public/v2/users', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}'}],
+  PUT:[{label:'Full update',  path:'/public/v2/users/1001', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}'}],
+  PATCH:[{label:'Partial',    path:'/public/v2/users/1001', params:[], body:'{\n  "status": "inactive"\n}'}],
+  DELETE:[{label:'Delete user',path:'/public/v2/users/1001',params:[], body:''}]
+};
+
+function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function pgInit(){
+  pgMethodChange();
+}
+
+function pgMethodChange(){
+  var m = document.getElementById('pgMethod').value;
+  var presets = PRESETS[m] || [];
+  var row = document.getElementById('pgPresets');
+  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
+  presets.forEach(function(p,i){
+    var btn = document.createElement('button');
+    btn.className = 'pg-preset' + (i===0 ? ' active' : '');
+    btn.textContent = p.label;
+    btn.setAttribute('onclick','pgLoadPreset(' + i + ')');
+    row.appendChild(btn);
+  });
+  pgLoadPreset(0);
+}
+
+function pgLoadPreset(idx){
+  var m = document.getElementById('pgMethod').value;
+  var p = (PRESETS[m]||[])[idx];
+  if(!p) return;
+  document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+  currentPath = p.path;
+  pgUpdateUrl();
+  var rows = document.getElementById('pgParamRows');
+  rows.innerHTML = '';
+  p.params.forEach(function(pr){ pgAddParam(pr.k, pr.v); });
+  document.getElementById('pgBody').value = p.body || '';
+}
+
+var currentPath = '/public/v2/users';
+
+function pgUpdateUrl(){
+  var params = pgGetParams();
+  var url = BASE + currentPath;
+  if(params.length) url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1]); }).join('&');
+  document.getElementById('pgUrl').textContent = url;
+  return url;
+}
+
+function pgAddParam(k,v){
+  k = k || ''; v = v || '';
+  var rows = document.getElementById('pgParamRows');
+  var div = document.createElement('div');
+  div.className = 'pg-row';
+  var k_inp = document.createElement('input');
+  k_inp.className = 'pg-inp'; k_inp.placeholder = 'key'; k_inp.value = k;
+  k_inp.setAttribute('oninput','pgUpdateUrl()');
+  var v_inp = document.createElement('input');
+  v_inp.className = 'pg-inp'; v_inp.placeholder = 'value'; v_inp.value = v;
+  v_inp.setAttribute('oninput','pgUpdateUrl()');
+  var del = document.createElement('button');
+  del.className = 'pg-del'; del.textContent = 'x'; del.title = 'Remove';
+  del.setAttribute('onclick','this.parentNode.remove();pgUpdateUrl()');
+  div.appendChild(k_inp); div.appendChild(v_inp); div.appendChild(del);
+  rows.appendChild(div);
+  pgUpdateUrl();
+}
+
+function pgGetParams(){
+  var pairs = [];
+  document.querySelectorAll('#pgParamRows .pg-row').forEach(function(row){
+    var ins = row.querySelectorAll('input');
+    var k = ins[0].value.trim(), v = ins[1].value.trim();
+    if(k) pairs.push([k,v]);
+  });
+  return pairs;
+}
+
+function pgTab(btn, name){
+  document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  ['params','auth','body'].forEach(function(n){
+    document.getElementById('pg-'+n).classList.toggle('on', n===name);
+  });
+}
+
+function pgRTab(btn, name){
+  document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('pgResBody').style.display    = name==='body'    ? 'flex' : 'none';
+  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block': 'none';
+}
+
+function pgFmt(){
+  try{ var el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){}
+}
+
+function pgCopy(){
+  navigator.clipboard.writeText(document.getElementById('pgPre').textContent).catch(function(){});
+}
+
+function pgSend(){
+  var method = document.getElementById('pgMethod').value;
+  var url = pgUpdateUrl();
+  var btn = document.getElementById('pgSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  var headers = {};
+  var authOn = document.getElementById('pgAuthOn').checked;
+  var token  = document.getElementById('pgToken').value.trim();
+  if(authOn && token) headers['Authorization'] = 'Bearer ' + token;
+  if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type'] = 'application/json';
+
+  var bodyVal = document.getElementById('pgBody').value.trim();
+  var fetchOpts = {method:method, headers:headers};
+  if((method==='POST'||method==='PUT'||method==='PATCH') && bodyVal) fetchOpts.body = bodyVal;
+
+  var t0 = Date.now();
+  fetch(url, fetchOpts).then(function(res){
+    var ms = Date.now()-t0;
+    var status = res.status;
+    var hdrs = {};
+    res.headers.forEach(function(v,k){ hdrs[k]=v; });
+    return res.text().then(function(txt){ pgShow(status, ms, txt, hdrs); });
+  }).catch(function(err){
+    pgShowErr(err.message);
+  }).finally(function(){
+    btn.disabled = false;
+    btn.textContent = '\u25ba Send';
+  });
+}
+
+function pgShow(status, ms, body, headers){
+  document.getElementById('pgEmpty').style.display = 'none';
+  document.getElementById('pgBadges').style.display = 'flex';
+  document.getElementById('pgResTabs').style.display = 'flex';
+
+  var badge = document.getElementById('pgStatus');
+  badge.textContent = status;
+  badge.className = 'pg-sbadge ' + (status<300?'s2':status<400?'s3':status<500?'s4':'s5');
+  document.getElementById('pgMs').textContent = ms + ' ms';
+
+  var pre = document.getElementById('pgPre');
+  pre.style.display = 'block';
+  pre.innerHTML = pgHL(body);
+
+  var tbl = document.getElementById('pgHTable');
+  var rows = '';
+  Object.keys(headers).forEach(function(k){ rows += '<tr><td>'+pgEsc(k)+'</td><td>'+pgEsc(headers[k])+'</td></tr>'; });
+  tbl.innerHTML = rows;
+
+  pgRTab(document.querySelector('.pg-rtab'), 'body');
+  document.getElementById('pgResBody').style.display = 'flex';
+  document.getElementById('pgResHeaders').style.display = 'none';
+}
+
+function pgShowErr(msg){
+  document.getElementById('pgEmpty').style.display = 'none';
+  document.getElementById('pgBadges').style.display = 'none';
+  document.getElementById('pgResTabs').style.display = 'none';
+  var pre = document.getElementById('pgPre');
+  pre.style.display = 'block';
+  pre.innerHTML = '<span style="color:#f87171">Error: ' + pgEsc(msg) + '</span>';
+  document.getElementById('pgResBody').style.display = 'flex';
+}
+
+function pgHL(txt){
+  try{
+    var obj = JSON.parse(txt);
+    var s = pgEsc(JSON.stringify(obj,null,2));
+    s = s.replace(/(&quot;)([^&]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4');
+    s = s.replace(/:\s*(&quot;)([^&]*)(&quot;)/g,': <span class="jstr">$1$2$3</span>');
+    s = s.replace(/:\s*(-?[0-9]+\.?[0-9]*)/g,': <span class="jnum">$1</span>');
+    s = s.replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>');
+    s = s.replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
+    return s;
+  }catch(e){ return pgEsc(txt); }
+}
+
+document.addEventListener('DOMContentLoaded', pgInit);
+</script>
+<script>
+var BASE = 'https://gorest.in';
+var PRESETS = {
+  GET:[
+    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
+    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
+    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
+    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
+    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''}
+  ],
+  POST:[{label:'Create user', path:'/public/v2/users', params:[], body:'{"name":"Naveen Kumar","email":"naveen@example.com","gender":"male","status":"active"}'}],
+  PUT:[{label:'Full update',  path:'/public/v2/users/1001', params:[], body:'{"name":"Naveen Updated","email":"naveen.u@example.com","gender":"male","status":"inactive"}'}],
+  PATCH:[{label:'Partial update', path:'/public/v2/users/1001', params:[], body:'{"status":"inactive"}'}],
+  DELETE:[{label:'Delete user', path:'/public/v2/users/1001', params:[], body:''}]
+};
+var currentPath = '/public/v2/users';
+function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pgInit(){ pgMethodChange(); }
+function pgMethodChange(){
+  var m = document.getElementById('pgMethod').value;
+  var presets = PRESETS[m] || [];
+  var row = document.getElementById('pgPresets');
+  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
+  presets.forEach(function(p,i){
+    var btn = document.createElement('button');
+    btn.className = 'pg-preset' + (i===0 ? ' active' : '');
+    btn.textContent = p.label;
+    btn.onclick = function(){ pgLoadPreset(i); };
+    row.appendChild(btn);
+  });
+  pgLoadPreset(0);
+}
+function pgLoadPreset(idx){
+  var m = document.getElementById('pgMethod').value;
+  var p = (PRESETS[m]||[])[idx];
+  if(!p) return;
+  document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+  currentPath = p.path;
+  pgUpdateUrl();
+  var rows = document.getElementById('pgParamRows');
+  rows.innerHTML = '';
+  (p.params||[]).forEach(function(pr){ pgAddParam(pr.k, pr.v); });
+  var body = p.body || '';
+  try{ body = JSON.stringify(JSON.parse(body), null, 2); }catch(e){}
+  document.getElementById('pgBody').value = body;
+}
+function pgUpdateUrl(){
+  var params = pgGetParams();
+  var url = BASE + currentPath;
+  if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
+  document.getElementById('pgUrl').textContent = url;
+  return url;
+}
+function pgAddParam(k,v){
+  k=k||''; v=v||'';
+  var rows = document.getElementById('pgParamRows');
+  var div = document.createElement('div');
+  div.className = 'pg-row';
+  var ki = document.createElement('input'); ki.className='pg-inp'; ki.placeholder='key'; ki.value=k; ki.oninput=pgUpdateUrl;
+  var vi = document.createElement('input'); vi.className='pg-inp'; vi.placeholder='value'; vi.value=v; vi.oninput=pgUpdateUrl;
+  var dl = document.createElement('button'); dl.className='pg-del'; dl.textContent='x'; dl.title='Remove';
+  dl.onclick = function(){ this.parentNode.remove(); pgUpdateUrl(); };
+  div.appendChild(ki); div.appendChild(vi); div.appendChild(dl);
+  rows.appendChild(div);
+  pgUpdateUrl();
+}
+function pgGetParams(){
+  var pairs=[];
+  document.querySelectorAll('#pgParamRows .pg-row').forEach(function(row){
+    var ins=row.querySelectorAll('input');
+    var k=ins[0].value.trim(), v=ins[1].value.trim();
+    if(k) pairs.push([k,v]);
+  });
+  return pairs;
+}
+function pgTab(btn,name){
+  document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  ['params','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
+}
+function pgRTab(btn,name){
+  document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('pgResBody').style.display    = name==='body'    ? 'flex' : 'none';
+  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block' : 'none';
+}
+function pgFmt(){ try{ var el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){} }
+function pgCopy(){ try{ navigator.clipboard.writeText(document.getElementById('pgPre').textContent); }catch(e){} }
+function pgSend(){
+  var method=document.getElementById('pgMethod').value;
+  var url=pgUpdateUrl();
+  var btn=document.getElementById('pgSendBtn');
+  btn.disabled=true; btn.textContent='Sending...';
+  var headers={};
+  if(document.getElementById('pgAuthOn').checked){
+    var tok=document.getElementById('pgToken').value.trim();
+    if(tok) headers['Authorization']='Bearer '+tok;
+  }
+  if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type']='application/json';
+  var bodyVal=document.getElementById('pgBody').value.trim();
+  var opts={method:method,headers:headers};
+  if((method==='POST'||method==='PUT'||method==='PATCH')&&bodyVal) opts.body=bodyVal;
+  var t0=Date.now();
+  fetch(url,opts).then(function(res){
+    var ms=Date.now()-t0, status=res.status, hdrs={};
+    res.headers.forEach(function(v,k){ hdrs[k]=v; });
+    return res.text().then(function(txt){ pgShow(status,ms,txt,hdrs); });
+  }).catch(function(err){ pgShowErr(err.message); }).then(function(){
+    btn.disabled=false; btn.textContent='Send';
+  });
+}
+function pgShow(status,ms,body,headers){
+  document.getElementById('pgEmpty').style.display='none';
+  document.getElementById('pgBadges').style.display='flex';
+  document.getElementById('pgResTabs').style.display='flex';
+  var badge=document.getElementById('pgStatus');
+  badge.textContent=status;
+  badge.className='pg-sbadge '+(status<300?'s2':status<400?'s3':status<500?'s4':'s5');
+  document.getElementById('pgMs').textContent=ms+' ms';
+  var pre=document.getElementById('pgPre');
+  pre.style.display='block'; pre.innerHTML=pgHL(body);
+  var rows='';
+  Object.keys(headers).forEach(function(k){ rows+='<tr><td>'+pgEsc(k)+'</td><td>'+pgEsc(headers[k])+'</td></tr>'; });
+  document.getElementById('pgHTable').innerHTML=rows;
+  pgRTab(document.querySelector('.pg-rtab'),'body');
+  document.getElementById('pgResBody').style.display='flex';
+  document.getElementById('pgResHeaders').style.display='none';
+}
+function pgShowErr(msg){
+  document.getElementById('pgEmpty').style.display='none';
+  document.getElementById('pgBadges').style.display='none';
+  document.getElementById('pgResTabs').style.display='none';
+  var pre=document.getElementById('pgPre');
+  pre.style.display='block';
+  pre.innerHTML='<span style="color:#f87171">Error: '+pgEsc(msg)+'</span>';
+  document.getElementById('pgResBody').style.display='flex';
+}
+function pgHL(txt){
+  try{
+    var s=pgEsc(JSON.stringify(JSON.parse(txt),null,2));
+    s=s.replace(/(&quot;)([^&<>]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4');
+    s=s.replace(/:\s*(&quot;)([^&<>]*)(&quot;)/g,': <span class="jstr">$1$2$3</span>');
+    s=s.replace(/:\s*(-?[0-9]+\.?[0-9]*)/g,': <span class="jnum">$1</span>');
+    s=s.replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>');
+    s=s.replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
+    return s;
+  }catch(e){ return pgEsc(txt); }
+}
+document.addEventListener('DOMContentLoaded',pgInit);
+</script>
 </body>
 </html>`);
 
@@ -1737,253 +2080,159 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 </footer>
 
 
+
+
+
 <script>
-// ── Endpoint definitions ────────────────────────────────────────────
-const PG_ENDPOINTS = {
-  GET: [
-    { label: "GET /users — list all",         path: "/public/v2/users",        params: [{k:"page",v:"1"},{k:"per_page",v:"10"}], body: false },
-    { label: "GET /users — filter status",    path: "/public/v2/users",        params: [{k:"status",v:"active"}], body: false },
-    { label: "GET /users — filter gender",    path: "/public/v2/users",        params: [{k:"gender",v:"male"}], body: false },
-    { label: "GET /users/:id — single user",  path: "/public/v2/users/1001",   params: [], body: false },
-    { label: "GET /users.xml — XML format",   path: "/public/v2/users.xml",    params: [], body: false },
+var BASE = 'https://gorest.in';
+var PRESETS = {
+  GET:[
+    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
+    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
+    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
+    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
+    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''}
   ],
-  POST: [
-    { label: "POST /users — create user",     path: "/public/v2/users",        params: [], body: true,
-      defaultBody: '{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}' },
-  ],
-  PUT: [
-    { label: "PUT /users/:id — full update",  path: "/public/v2/users/1001",   params: [], body: true,
-      defaultBody: '{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}' },
-  ],
-  PATCH: [
-    { label: "PATCH /users/:id — partial",    path: "/public/v2/users/1001",   params: [], body: true,
-      defaultBody: '{\n  "status": "inactive"\n}' },
-  ],
-  DELETE: [
-    { label: "DELETE /users/:id — delete",    path: "/public/v2/users/1001",   params: [], body: false },
-  ],
+  POST:[{label:'Create user', path:'/public/v2/users', params:[], body:'{"name":"Naveen Kumar","email":"naveen@example.com","gender":"male","status":"active"}'}],
+  PUT:[{label:'Full update',  path:'/public/v2/users/1001', params:[], body:'{"name":"Naveen Updated","email":"naveen.u@example.com","gender":"male","status":"inactive"}'}],
+  PATCH:[{label:'Partial update', path:'/public/v2/users/1001', params:[], body:'{"status":"inactive"}'}],
+  DELETE:[{label:'Delete user', path:'/public/v2/users/1001', params:[], body:''}]
 };
-
-// ── Init ─────────────────────────────────────────────────────────────
-function pgInit() {
-  pgUpdateEndpoints();
-  document.getElementById('pg-method').addEventListener('change', pgUpdateEndpoints);
-  document.getElementById('pg-endpoint').addEventListener('change', pgEndpointChanged);
-}
-
-function pgUpdateEndpoints() {
-  const method = document.getElementById('pg-method').value;
-  const sel = document.getElementById('pg-endpoint');
-  sel.innerHTML = '';
-  (PG_ENDPOINTS[method] || []).forEach((ep, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = ep.path;
-    sel.appendChild(opt);
+var currentPath = '/public/v2/users';
+function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function pgInit(){ pgMethodChange(); }
+function pgMethodChange(){
+  var m = document.getElementById('pgMethod').value;
+  var presets = PRESETS[m] || [];
+  var row = document.getElementById('pgPresets');
+  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
+  presets.forEach(function(p,i){
+    var btn = document.createElement('button');
+    btn.className = 'pg-preset' + (i===0 ? ' active' : '');
+    btn.textContent = p.label;
+    btn.onclick = function(){ pgLoadPreset(i); };
+    row.appendChild(btn);
   });
-  pgEndpointChanged();
+  pgLoadPreset(0);
 }
-
-function pgEndpointChanged() {
-  const method = document.getElementById('pg-method').value;
-  const idx = document.getElementById('pg-endpoint').value;
-  const ep = (PG_ENDPOINTS[method] || [])[idx];
-  if (!ep) return;
-  // Set params
-  const tbody = document.getElementById('pg-params-body');
-  tbody.innerHTML = '';
-  ep.params.forEach(p => pgAddParam(p.k, p.v));
-  // Set body
-  const bodyEl = document.getElementById('pg-body');
-  if (ep.body && ep.defaultBody) {
-    bodyEl.value = ep.defaultBody;
-  } else {
-    bodyEl.value = '';
-  }
+function pgLoadPreset(idx){
+  var m = document.getElementById('pgMethod').value;
+  var p = (PRESETS[m]||[])[idx];
+  if(!p) return;
+  document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
+  currentPath = p.path;
+  pgUpdateUrl();
+  var rows = document.getElementById('pgParamRows');
+  rows.innerHTML = '';
+  (p.params||[]).forEach(function(pr){ pgAddParam(pr.k, pr.v); });
+  var body = p.body || '';
+  try{ body = JSON.stringify(JSON.parse(body), null, 2); }catch(e){}
+  document.getElementById('pgBody').value = body;
 }
-
-// ── Params ───────────────────────────────────────────────────────────
-function pgAddParam(key='', val='') {
-  const tbody = document.getElementById('pg-params-body');
-  const tr = document.createElement('tr');
-  tr.innerHTML = \`
-    <td><input class="pg-param-input" type="text" placeholder="key" value="\${escHtml(key)}"></td>
-    <td><input class="pg-param-input" type="text" placeholder="value" value="\${escHtml(val)}"></td>
-    <td><button class="pg-param-del" onclick="this.closest('tr').remove()" title="Remove">×</button></td>
-  \`;
-  tbody.appendChild(tr);
+function pgUpdateUrl(){
+  var params = pgGetParams();
+  var url = BASE + currentPath;
+  if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
+  document.getElementById('pgUrl').textContent = url;
+  return url;
 }
-
-function pgGetParams() {
-  const rows = document.querySelectorAll('#pg-params-body tr');
-  const params = [];
-  rows.forEach(tr => {
-    const inputs = tr.querySelectorAll('input');
-    const k = inputs[0].value.trim();
-    const v = inputs[1].value.trim();
-    if (k) params.push([k, v]);
+function pgAddParam(k,v){
+  k=k||''; v=v||'';
+  var rows = document.getElementById('pgParamRows');
+  var div = document.createElement('div');
+  div.className = 'pg-row';
+  var ki = document.createElement('input'); ki.className='pg-inp'; ki.placeholder='key'; ki.value=k; ki.oninput=pgUpdateUrl;
+  var vi = document.createElement('input'); vi.className='pg-inp'; vi.placeholder='value'; vi.value=v; vi.oninput=pgUpdateUrl;
+  var dl = document.createElement('button'); dl.className='pg-del'; dl.textContent='x'; dl.title='Remove';
+  dl.onclick = function(){ this.parentNode.remove(); pgUpdateUrl(); };
+  div.appendChild(ki); div.appendChild(vi); div.appendChild(dl);
+  rows.appendChild(div);
+  pgUpdateUrl();
+}
+function pgGetParams(){
+  var pairs=[];
+  document.querySelectorAll('#pgParamRows .pg-row').forEach(function(row){
+    var ins=row.querySelectorAll('input');
+    var k=ins[0].value.trim(), v=ins[1].value.trim();
+    if(k) pairs.push([k,v]);
   });
-  return params;
+  return pairs;
 }
-
-// ── Tabs ─────────────────────────────────────────────────────────────
-function pgTab(btn, name) {
-  document.querySelectorAll('.pg-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  ['params','auth','body'].forEach(p => {
-    document.getElementById('pg-panel-' + p).style.display = p === name ? '' : 'none';
+function pgTab(btn,name){
+  document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  ['params','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
+}
+function pgRTab(btn,name){
+  document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
+  btn.classList.add('on');
+  document.getElementById('pgResBody').style.display    = name==='body'    ? 'flex' : 'none';
+  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block' : 'none';
+}
+function pgFmt(){ try{ var el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){} }
+function pgCopy(){ try{ navigator.clipboard.writeText(document.getElementById('pgPre').textContent); }catch(e){} }
+function pgSend(){
+  var method=document.getElementById('pgMethod').value;
+  var url=pgUpdateUrl();
+  var btn=document.getElementById('pgSendBtn');
+  btn.disabled=true; btn.textContent='Sending...';
+  var headers={};
+  if(document.getElementById('pgAuthOn').checked){
+    var tok=document.getElementById('pgToken').value.trim();
+    if(tok) headers['Authorization']='Bearer '+tok;
+  }
+  if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type']='application/json';
+  var bodyVal=document.getElementById('pgBody').value.trim();
+  var opts={method:method,headers:headers};
+  if((method==='POST'||method==='PUT'||method==='PATCH')&&bodyVal) opts.body=bodyVal;
+  var t0=Date.now();
+  fetch(url,opts).then(function(res){
+    var ms=Date.now()-t0, status=res.status, hdrs={};
+    res.headers.forEach(function(v,k){ hdrs[k]=v; });
+    return res.text().then(function(txt){ pgShow(status,ms,txt,hdrs); });
+  }).catch(function(err){ pgShowErr(err.message); }).then(function(){
+    btn.disabled=false; btn.textContent='Send';
   });
 }
-
-function pgResTab(btn, name) {
-  document.querySelectorAll('.pg-res-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('pg-res-body-panel').style.display = name === 'body' ? '' : 'none';
-  document.getElementById('pg-res-headers-panel').style.display = name === 'headers' ? '' : 'none';
+function pgShow(status,ms,body,headers){
+  document.getElementById('pgEmpty').style.display='none';
+  document.getElementById('pgBadges').style.display='flex';
+  document.getElementById('pgResTabs').style.display='flex';
+  var badge=document.getElementById('pgStatus');
+  badge.textContent=status;
+  badge.className='pg-sbadge '+(status<300?'s2':status<400?'s3':status<500?'s4':'s5');
+  document.getElementById('pgMs').textContent=ms+' ms';
+  var pre=document.getElementById('pgPre');
+  pre.style.display='block'; pre.innerHTML=pgHL(body);
+  var rows='';
+  Object.keys(headers).forEach(function(k){ rows+='<tr><td>'+pgEsc(k)+'</td><td>'+pgEsc(headers[k])+'</td></tr>'; });
+  document.getElementById('pgHTable').innerHTML=rows;
+  pgRTab(document.querySelector('.pg-rtab'),'body');
+  document.getElementById('pgResBody').style.display='flex';
+  document.getElementById('pgResHeaders').style.display='none';
 }
-
-function pgAuthTypeChange() {
-  const type = document.getElementById('pg-auth-type').value;
-  document.getElementById('pg-auth-token-row').style.display = type === 'bearer' ? '' : 'none';
+function pgShowErr(msg){
+  document.getElementById('pgEmpty').style.display='none';
+  document.getElementById('pgBadges').style.display='none';
+  document.getElementById('pgResTabs').style.display='none';
+  var pre=document.getElementById('pgPre');
+  pre.style.display='block';
+  pre.innerHTML='<span style="color:#f87171">Error: '+pgEsc(msg)+'</span>';
+  document.getElementById('pgResBody').style.display='flex';
 }
-
-// ── Send ─────────────────────────────────────────────────────────────
-async function pgSend() {
-  const method = document.getElementById('pg-method').value;
-  const idx = document.getElementById('pg-endpoint').value;
-  const ep = (PG_ENDPOINTS[method] || [])[idx];
-  if (!ep) return;
-
-  const btn = document.getElementById('pg-send');
-  btn.disabled = true;
-  btn.classList.add('loading');
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2a10 10 0 1 0 10 10"/></svg> Sending…';
-
-  // Build URL
-  const params = pgGetParams();
-  let url = 'https://gorest.in' + ep.path;
-  if (params.length) {
-    url += '?' + params.map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
-  }
-
-  // Build headers
-  const headers = {};
-  const authType = document.getElementById('pg-auth-type').value;
-  if (authType === 'bearer') {
-    const token = document.getElementById('pg-auth-token').value.trim();
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-  }
-  if (['POST','PUT','PATCH'].includes(method)) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  // Body
-  let body = undefined;
-  if (['POST','PUT','PATCH'].includes(method)) {
-    body = document.getElementById('pg-body').value.trim() || undefined;
-  }
-
-  const t0 = Date.now();
-  try {
-    const res = await fetch(url, { method, headers, body });
-    const elapsed = Date.now() - t0;
-    const resText = await res.text();
-    const resHeaders = {};
-    res.headers.forEach((v, k) => { resHeaders[k] = v; });
-    pgShowResponse(res.status, elapsed, resText, resHeaders);
-  } catch (err) {
-    pgShowError(err.message);
-  }
-
-  btn.disabled = false;
-  btn.classList.remove('loading');
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send';
+function pgHL(txt){
+  try{
+    var s=pgEsc(JSON.stringify(JSON.parse(txt),null,2));
+    s=s.replace(/(&quot;)([^&<>]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4');
+    s=s.replace(/:\s*(&quot;)([^&<>]*)(&quot;)/g,': <span class="jstr">$1$2$3</span>');
+    s=s.replace(/:\s*(-?[0-9]+\.?[0-9]*)/g,': <span class="jnum">$1</span>');
+    s=s.replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>');
+    s=s.replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
+    return s;
+  }catch(e){ return pgEsc(txt); }
 }
-
-// ── Response rendering ────────────────────────────────────────────────
-function pgShowResponse(status, ms, body, headers) {
-  document.getElementById('pg-placeholder').style.display = 'none';
-  document.getElementById('pg-res-meta').style.display = 'flex';
-  document.getElementById('pg-res-tabs').style.display = 'flex';
-
-  // Status badge
-  const badge = document.getElementById('pg-res-status');
-  badge.textContent = status;
-  badge.className = 'pg-status-badge ' + (status < 300 ? 'status-2xx' : status < 400 ? 'status-3xx' : status < 500 ? 'status-4xx' : 'status-5xx');
-
-  // Time
-  document.getElementById('pg-res-time').textContent = ms + ' ms';
-
-  // Body
-  const bodyEl = document.getElementById('pg-res-body');
-  bodyEl.style.display = 'block';
-  bodyEl.innerHTML = pgHighlight(body);
-
-  // Headers table
-  const tbl = document.getElementById('pg-headers-table');
-  tbl.innerHTML = Object.entries(headers).map(([k,v]) =>
-    \`<tr><td>\${escHtml(k)}</td><td>\${escHtml(v)}</td></tr>\`
-  ).join('');
-
-  // Switch to body tab
-  pgResTab(document.querySelector('.pg-res-tab'), 'body');
-}
-
-function pgShowError(msg) {
-  document.getElementById('pg-placeholder').style.display = 'none';
-  document.getElementById('pg-res-meta').style.display = 'none';
-  document.getElementById('pg-res-tabs').style.display = 'none';
-  const bodyEl = document.getElementById('pg-res-body');
-  bodyEl.style.display = 'block';
-  bodyEl.innerHTML = \`<span class="jerr">Error: \${escHtml(msg)}</span>\`;
-}
-
-// ── JSON syntax highlighter ──────────────────────────────────────────
-function pgHighlight(text) {
-  try {
-    const obj = JSON.parse(text);
-    return syntaxHL(JSON.stringify(obj, null, 2));
-  } catch {
-    // XML or plain text
-    if (text.trim().startsWith('<')) return escHtml(text);
-    return escHtml(text);
-  }
-}
-
-function syntaxHL(json) {
-  return escHtml(json)
-    .replace(/(&quot;)(.*?)(&quot;)(\s*:)/g, '<span class="jk">$1$2$3</span>$4')
-    .replace(/:\s*(&quot;)(.*?)(&quot;)/g, ': <span class="js">$1$2$3</span>')
-    .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="jn">$1</span>')
-    .replace(/:\s*(true|false)/g, ': <span class="jb">$1</span>')
-    .replace(/:\s*(null)/g, ': <span class="jnull">$1</span>');
-}
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────
-function pgFormatBody() {
-  try {
-    const el = document.getElementById('pg-body');
-    el.value = JSON.stringify(JSON.parse(el.value), null, 2);
-  } catch {}
-}
-function pgClearBody() { document.getElementById('pg-body').value = ''; }
-function pgCopyRes() {
-  const txt = document.getElementById('pg-res-body').textContent;
-  navigator.clipboard.writeText(txt).catch(() => {});
-}
-
-// spin animation for loading
-const spinStyle = document.createElement('style');
-spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-document.head.appendChild(spinStyle);
-
-document.addEventListener('DOMContentLoaded', pgInit);
+document.addEventListener('DOMContentLoaded',pgInit);
 </script>
-
 </body>
 </html>`);
 });
