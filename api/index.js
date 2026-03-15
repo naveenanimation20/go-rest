@@ -1329,7 +1329,8 @@ function pgCopy(){
 
 function pgSend(){
   var method = document.getElementById('pgMethod').value;
-  var url = pgUpdateUrl();
+  var url = document.getElementById('pgUrl').value.trim();
+  if(!url) return;
   var btn = document.getElementById('pgSendBtn');
   btn.disabled = true;
   btn.textContent = 'Sending...';
