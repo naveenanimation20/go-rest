@@ -537,12 +537,14 @@ body {
   color: var(--amber); padding: 0 14px; min-width: 86px; cursor: pointer; outline: none;
   -webkit-appearance: none; appearance: none;
 }
-.pg-url-display {
+.pg-url-input {
   flex: 1; font-family: var(--mono); font-size: 12.5px; color: var(--green);
-  padding: 0 14px; display: flex; align-items: center; overflow: hidden;
-  white-space: nowrap; text-overflow: ellipsis; min-width: 0;
-  border-right: 1px solid var(--border); cursor: default; user-select: all;
+  padding: 0 14px; background: transparent; border: none;
+  border-right: 1px solid var(--border); outline: none; min-width: 0;
+  height: 46px;
 }
+.pg-url-input:focus { background: var(--bg3); color: var(--text); }
+.pg-url-input::placeholder { color: var(--text3); }
 .pg-send {
   font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: .3px;
   background: var(--red); color: #fff; border: none; padding: 0 24px;
@@ -923,7 +925,7 @@ textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
             <select class="pg-method" id="pgMethod" onchange="pgMethodChange()">
               <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
             </select>
-            <div class="pg-url-display" id="pgUrl">https://gorest.in/public/v2/users</div>
+            <input class="pg-url-input" id="pgUrl" type="text" value="https://gorest.in/public/v2/users" spellcheck="false" autocomplete="off" oninput="pgUrlEdited()">
             <button class="pg-send" id="pgSendBtn" onclick="pgSend()">&#9654; Send</button>
           </div>
 
@@ -1084,7 +1086,7 @@ function pgUpdateUrl(){
   const params = pgGetParams();
   let url = BASE + currentPath;
   if(params.length) url += '?' + params.map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
-  document.getElementById('pgUrl').textContent = url;
+  document.getElementById('pgUrl').value = url;
   return url;
 }
 
@@ -1269,7 +1271,7 @@ function pgUpdateUrl(){
   var params = pgGetParams();
   var url = BASE + currentPath;
   if(params.length) url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1]); }).join('&');
-  document.getElementById('pgUrl').textContent = url;
+  document.getElementById('pgUrl').value = url;
   return url;
 }
 
@@ -1424,6 +1426,10 @@ var PRESETS = {
 var currentPath = '/public/v2/users';
 function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pgInit(){ pgMethodChange(); }
+function pgUrlEdited(){
+  // User manually typed in URL — deactivate preset highlights
+  document.querySelectorAll('.pg-preset').forEach(function(b){ b.classList.remove('active'); });
+}
 function pgMethodChange(){
   var m = document.getElementById('pgMethod').value;
   var presets = PRESETS[m] || [];
@@ -1456,7 +1462,7 @@ function pgUpdateUrl(){
   var params = pgGetParams();
   var url = BASE + currentPath;
   if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
-  document.getElementById('pgUrl').textContent = url;
+  document.getElementById('pgUrl').value = url;
   return url;
 }
 function pgAddParam(k,v){
@@ -1496,7 +1502,10 @@ function pgFmt(){ try{ var el=document.getElementById('pgBody'); el.value=JSON.s
 function pgCopy(){ try{ navigator.clipboard.writeText(document.getElementById('pgPre').textContent); }catch(e){} }
 function pgSend(){
   var method=document.getElementById('pgMethod').value;
-  var url=pgUpdateUrl();
+  // If user manually edited the URL field, use that directly
+  var urlInput = document.getElementById('pgUrl');
+  pgUpdateUrl(); // sync params to url if not manually edited
+  var url = urlInput.value.trim() || pgUpdateUrl();
   var btn=document.getElementById('pgSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   var headers={};
@@ -2101,6 +2110,10 @@ var PRESETS = {
 var currentPath = '/public/v2/users';
 function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pgInit(){ pgMethodChange(); }
+function pgUrlEdited(){
+  // User manually typed in URL — deactivate preset highlights
+  document.querySelectorAll('.pg-preset').forEach(function(b){ b.classList.remove('active'); });
+}
 function pgMethodChange(){
   var m = document.getElementById('pgMethod').value;
   var presets = PRESETS[m] || [];
@@ -2133,7 +2146,7 @@ function pgUpdateUrl(){
   var params = pgGetParams();
   var url = BASE + currentPath;
   if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
-  document.getElementById('pgUrl').textContent = url;
+  document.getElementById('pgUrl').value = url;
   return url;
 }
 function pgAddParam(k,v){
