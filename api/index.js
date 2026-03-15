@@ -1020,7 +1020,6 @@ textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
 
 
 <script>
-(function(){
 const BASE = 'https://gorest.in';
 const PRESETS = {
   GET:[
@@ -1213,7 +1212,6 @@ function hlJson(txt){
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.addEventListener('DOMContentLoaded', init);
-})();
 </script>
 </body>
 </html>`);
