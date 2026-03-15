@@ -1021,394 +1021,9 @@ textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
 
 
 
-<script>
-const BASE = 'https://gorest.in';
-const PRESETS = {
-  GET:[
-    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
-    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
-    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
-    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
-    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''},
-  ],
-  POST:[
-    {label:'Create user', path:'/public/v2/users', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}'},
-  ],
-  PUT:[
-    {label:'Full update', path:'/public/v2/users/1001', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}'},
-  ],
-  PATCH:[
-    {label:'Partial update', path:'/public/v2/users/1001', params:[], body:'{\n  "status": "inactive"\n}'},
-  ],
-  DELETE:[
-    {label:'Delete user', path:'/public/v2/users/1001', params:[], body:''},
-  ],
-};
 
-let currentPath = '/public/v2/users';
-let currentPreset = 0;
 
-function init(){
-  pgMethodChange();
-}
 
-window.pgMethodChange = function(){
-  const m = document.getElementById('pgMethod').value;
-  const presets = PRESETS[m] || [];
-  const row = document.getElementById('pgPresets');
-  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
-  presets.forEach((p,i)=>{
-    const btn = document.createElement('button');
-    btn.className = 'pg-preset' + (i===0?' active':'');
-    btn.textContent = p.label;
-    btn.onclick = ()=>pgLoadPreset(m,i);
-    row.appendChild(btn);
-  });
-  pgLoadPreset(m, 0);
-};
-
-function pgLoadPreset(method, idx){
-  currentPreset = idx;
-  document.querySelectorAll('.pg-preset').forEach((b,i)=>b.classList.toggle('active',i===idx));
-  const p = (PRESETS[method]||[])[idx];
-  if(!p) return;
-  currentPath = p.path;
-  pgUpdateUrl();
-  // params
-  const rows = document.getElementById('pgParamRows');
-  rows.innerHTML = '';
-  p.params.forEach(({k,v})=>pgAddParam(k,v));
-  // body
-  document.getElementById('pgBody').value = p.body || '';
-}
-
-function pgUpdateUrl(){
-  const params = pgGetParams();
-  let url = BASE + currentPath;
-  if(params.length) url += '?' + params.map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
-  document.getElementById('pgUrl').value = url;
-  return url;
-}
-
-window.pgAddParam = function(k='',v=''){
-  const rows = document.getElementById('pgParamRows');
-  const div = document.createElement('div');
-  div.className = 'pg-row';
-  div.innerHTML = '<input class="pg-inp" placeholder="key" value="'+esc(k)+'" oninput="pgUpdateUrl()"><input class="pg-inp" placeholder="value" value="'+esc(v)+'" oninput="pgUpdateUrl()"><button class="pg-del" onclick="this.parentNode.remove();pgUpdateUrl()" title="Remove">&times;</button>';
-  rows.appendChild(div);
-  pgUpdateUrl();
-};
-
-function pgGetParams(){
-  const pairs = [];
-  document.querySelectorAll('#pgParamRows .pg-row').forEach(row=>{
-    const ins = row.querySelectorAll('input');
-    const k = ins[0].value.trim(), v = ins[1].value.trim();
-    if(k) pairs.push([k,v]);
-  });
-  return pairs;
-}
-
-window.pgTab = function(btn, name){
-  document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  ['params','auth','body'].forEach(n=>{
-    document.getElementById('pg-'+n).classList.toggle('on', n===name);
-  });
-};
-
-window.pgRTab = function(btn, name){
-  document.querySelectorAll('.pg-rtab').forEach(t=>t.classList.remove('on'));
-  btn.classList.add('on');
-  document.getElementById('pgResBody').style.display  = name==='body'    ? 'flex' : 'none';
-  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block' : 'none';
-};
-
-window.pgFmt = function(){
-  try{ const el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){}
-};
-
-window.pgCopy = function(){
-  navigator.clipboard.writeText(document.getElementById('pgPre').textContent).catch(()=>{});
-};
-
-window.pgSend = async function(){
-  const method = document.getElementById('pgMethod').value;
-  const url = pgUpdateUrl();
-  const btn = document.getElementById('pgSendBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinning">&#8635;</span> Sending';
-
-  const headers = {};
-  const authOn = document.getElementById('pgAuthOn').checked;
-  const token  = document.getElementById('pgToken').value.trim();
-  if(authOn && token) headers['Authorization'] = 'Bearer ' + token;
-  if(['POST','PUT','PATCH'].includes(method)) headers['Content-Type'] = 'application/json';
-
-  const bodyVal = document.getElementById('pgBody').value.trim();
-  const fetchOpts = { method, headers };
-  if(['POST','PUT','PATCH'].includes(method) && bodyVal) fetchOpts.body = bodyVal;
-
-  const t0 = Date.now();
-  try{
-    const res = await fetch(url, fetchOpts);
-    const ms  = Date.now() - t0;
-    const txt = await res.text();
-    const hdrs = {};
-    res.headers.forEach((v,k)=>{ hdrs[k]=v; });
-    pgShow(res.status, ms, txt, hdrs);
-  }catch(err){
-    pgShowErr(err.message);
-  }
-
-  btn.disabled = false;
-  btn.innerHTML = '&#9654; Send';
-};
-
-function pgShow(status, ms, body, headers){
-  document.getElementById('pgEmpty').style.display = 'none';
-  document.getElementById('pgBadges').style.display = 'flex';
-  document.getElementById('pgResTabs').style.display = 'flex';
-
-  const badge = document.getElementById('pgStatus');
-  badge.textContent = status;
-  badge.className = 'pg-sbadge ' + (status<300?'s2':status<400?'s3':status<500?'s4':'s5');
-  document.getElementById('pgMs').textContent = ms + ' ms';
-
-  const pre = document.getElementById('pgPre');
-  pre.style.display = 'block';
-  pre.innerHTML = hlJson(body);
-
-  const tbl = document.getElementById('pgHTable');
-  tbl.innerHTML = Object.entries(headers).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('');
-
-  pgRTab(document.querySelector('.pg-rtab'), 'body');
-  document.getElementById('pgResBody').style.display = 'flex';
-  document.getElementById('pgResHeaders').style.display = 'none';
-}
-
-function pgShowErr(msg){
-  document.getElementById('pgEmpty').style.display = 'none';
-  document.getElementById('pgBadges').style.display = 'none';
-  document.getElementById('pgResTabs').style.display = 'none';
-  const pre = document.getElementById('pgPre');
-  pre.style.display = 'block';
-  pre.innerHTML = '<span style="color:#f87171">Error: ' + esc(msg) + '</span>';
-  document.getElementById('pgResBody').style.display = 'flex';
-}
-
-function hlJson(txt){
-  try{
-    const obj = JSON.parse(txt);
-    return esc(JSON.stringify(obj,null,2))
-      .replace(/(&quot;)([\w\s-]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4')
-      .replace(/:\s*(&quot;)(.*?)(&quot;)/g,': <span class="jstr">$1$2$3</span>')
-      .replace(/:\s*(-?\d+\.?\d*)/g,': <span class="jnum">$1</span>')
-      .replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>')
-      .replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
-  }catch{
-    return esc(txt);
-  }
-}
-
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-document.addEventListener('DOMContentLoaded', init);
-</script>
-<script>
-var BASE = 'https://gorest.in';
-var PRESETS = {
-  GET:[
-    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
-    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
-    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
-    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
-    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''}
-  ],
-  POST:[{label:'Create user', path:'/public/v2/users', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}'}],
-  PUT:[{label:'Full update',  path:'/public/v2/users/1001', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}'}],
-  PATCH:[{label:'Partial',    path:'/public/v2/users/1001', params:[], body:'{\n  "status": "inactive"\n}'}],
-  DELETE:[{label:'Delete user',path:'/public/v2/users/1001',params:[], body:''}]
-};
-
-function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function pgInit(){
-  pgMethodChange();
-}
-
-function pgMethodChange(){
-  var m = document.getElementById('pgMethod').value;
-  var presets = PRESETS[m] || [];
-  var row = document.getElementById('pgPresets');
-  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
-  presets.forEach(function(p,i){
-    var btn = document.createElement('button');
-    btn.className = 'pg-preset' + (i===0 ? ' active' : '');
-    btn.textContent = p.label;
-    btn.setAttribute('onclick','pgLoadPreset(' + i + ')');
-    row.appendChild(btn);
-  });
-  pgLoadPreset(0);
-}
-
-function pgLoadPreset(idx){
-  var m = document.getElementById('pgMethod').value;
-  var p = (PRESETS[m]||[])[idx];
-  if(!p) return;
-  document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
-  currentPath = p.path;
-  pgUpdateUrl();
-  var rows = document.getElementById('pgParamRows');
-  rows.innerHTML = '';
-  p.params.forEach(function(pr){ pgAddParam(pr.k, pr.v); });
-  document.getElementById('pgBody').value = p.body || '';
-}
-
-var currentPath = '/public/v2/users';
-
-function pgUpdateUrl(){
-  var params = pgGetParams();
-  var url = BASE + currentPath;
-  if(params.length) url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0]) + '=' + encodeURIComponent(kv[1]); }).join('&');
-  document.getElementById('pgUrl').value = url;
-  return url;
-}
-
-function pgAddParam(k,v){
-  k = k || ''; v = v || '';
-  var rows = document.getElementById('pgParamRows');
-  var div = document.createElement('div');
-  div.className = 'pg-row';
-  var k_inp = document.createElement('input');
-  k_inp.className = 'pg-inp'; k_inp.placeholder = 'key'; k_inp.value = k;
-  k_inp.setAttribute('oninput','pgUpdateUrl()');
-  var v_inp = document.createElement('input');
-  v_inp.className = 'pg-inp'; v_inp.placeholder = 'value'; v_inp.value = v;
-  v_inp.setAttribute('oninput','pgUpdateUrl()');
-  var del = document.createElement('button');
-  del.className = 'pg-del'; del.textContent = 'x'; del.title = 'Remove';
-  del.setAttribute('onclick','this.parentNode.remove();pgUpdateUrl()');
-  div.appendChild(k_inp); div.appendChild(v_inp); div.appendChild(del);
-  rows.appendChild(div);
-  pgUpdateUrl();
-}
-
-function pgGetParams(){
-  var pairs = [];
-  document.querySelectorAll('#pgParamRows .pg-row').forEach(function(row){
-    var ins = row.querySelectorAll('input');
-    var k = ins[0].value.trim(), v = ins[1].value.trim();
-    if(k) pairs.push([k,v]);
-  });
-  return pairs;
-}
-
-function pgTab(btn, name){
-  document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
-  btn.classList.add('on');
-  ['params','auth','body'].forEach(function(n){
-    document.getElementById('pg-'+n).classList.toggle('on', n===name);
-  });
-}
-
-function pgRTab(btn, name){
-  document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
-  btn.classList.add('on');
-  document.getElementById('pgResBody').style.display    = name==='body'    ? 'flex' : 'none';
-  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block': 'none';
-}
-
-function pgFmt(){
-  try{ var el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){}
-}
-
-function pgCopy(){
-  navigator.clipboard.writeText(document.getElementById('pgPre').textContent).catch(function(){});
-}
-
-function pgSend(){
-  var method = document.getElementById('pgMethod').value;
-  var url = document.getElementById('pgUrl').value.trim();
-  if(!url) return;
-  var btn = document.getElementById('pgSendBtn');
-  btn.disabled = true;
-  btn.textContent = 'Sending...';
-
-  var headers = {};
-  var authOn = document.getElementById('pgAuthOn').checked;
-  var token  = document.getElementById('pgToken').value.trim();
-  if(authOn && token) headers['Authorization'] = 'Bearer ' + token;
-  if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type'] = 'application/json';
-
-  var bodyVal = document.getElementById('pgBody').value.trim();
-  var fetchOpts = {method:method, headers:headers};
-  if((method==='POST'||method==='PUT'||method==='PATCH') && bodyVal) fetchOpts.body = bodyVal;
-
-  var t0 = Date.now();
-  fetch(url, fetchOpts).then(function(res){
-    var ms = Date.now()-t0;
-    var status = res.status;
-    var hdrs = {};
-    res.headers.forEach(function(v,k){ hdrs[k]=v; });
-    return res.text().then(function(txt){ pgShow(status, ms, txt, hdrs); });
-  }).catch(function(err){
-    pgShowErr(err.message);
-  }).finally(function(){
-    btn.disabled = false;
-    btn.textContent = '\u25ba Send';
-  });
-}
-
-function pgShow(status, ms, body, headers){
-  document.getElementById('pgEmpty').style.display = 'none';
-  document.getElementById('pgBadges').style.display = 'flex';
-  document.getElementById('pgResTabs').style.display = 'flex';
-
-  var badge = document.getElementById('pgStatus');
-  badge.textContent = status;
-  badge.className = 'pg-sbadge ' + (status<300?'s2':status<400?'s3':status<500?'s4':'s5');
-  document.getElementById('pgMs').textContent = ms + ' ms';
-
-  var pre = document.getElementById('pgPre');
-  pre.style.display = 'block';
-  pre.innerHTML = pgHL(body);
-
-  var tbl = document.getElementById('pgHTable');
-  var rows = '';
-  Object.keys(headers).forEach(function(k){ rows += '<tr><td>'+pgEsc(k)+'</td><td>'+pgEsc(headers[k])+'</td></tr>'; });
-  tbl.innerHTML = rows;
-
-  pgRTab(document.querySelector('.pg-rtab'), 'body');
-  document.getElementById('pgResBody').style.display = 'flex';
-  document.getElementById('pgResHeaders').style.display = 'none';
-}
-
-function pgShowErr(msg){
-  document.getElementById('pgEmpty').style.display = 'none';
-  document.getElementById('pgBadges').style.display = 'none';
-  document.getElementById('pgResTabs').style.display = 'none';
-  var pre = document.getElementById('pgPre');
-  pre.style.display = 'block';
-  pre.innerHTML = '<span style="color:#f87171">Error: ' + pgEsc(msg) + '</span>';
-  document.getElementById('pgResBody').style.display = 'flex';
-}
-
-function pgHL(txt){
-  try{
-    var obj = JSON.parse(txt);
-    var s = pgEsc(JSON.stringify(obj,null,2));
-    s = s.replace(/(&quot;)([^&]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4');
-    s = s.replace(/:\s*(&quot;)([^&]*)(&quot;)/g,': <span class="jstr">$1$2$3</span>');
-    s = s.replace(/:\s*(-?[0-9]+\.?[0-9]*)/g,': <span class="jnum">$1</span>');
-    s = s.replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>');
-    s = s.replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
-    return s;
-  }catch(e){ return pgEsc(txt); }
-}
-
-document.addEventListener('DOMContentLoaded', pgInit);
-</script>
 <script>
 var BASE = 'https://gorest.in';
 var PRESETS = {
@@ -1425,10 +1040,11 @@ var PRESETS = {
   DELETE:[{label:'Delete user', path:'/public/v2/users/1001', params:[], body:''}]
 };
 var currentPath = '/public/v2/users';
+var pgUrlManuallyEdited = false;
 function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pgInit(){ pgMethodChange(); }
 function pgUrlEdited(){
-  // User manually typed in URL — deactivate preset highlights
+  pgUrlManuallyEdited = true;
   document.querySelectorAll('.pg-preset').forEach(function(b){ b.classList.remove('active'); });
 }
 function pgMethodChange(){
@@ -1451,6 +1067,7 @@ function pgLoadPreset(idx){
   if(!p) return;
   document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
   currentPath = p.path;
+  pgUrlManuallyEdited = false;  // preset click resets the manual edit flag
   pgUpdateUrl();
   var rows = document.getElementById('pgParamRows');
   rows.innerHTML = '';
@@ -1463,7 +1080,10 @@ function pgUpdateUrl(){
   var params = pgGetParams();
   var url = BASE + currentPath;
   if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
-  document.getElementById('pgUrl').value = url;
+  // Only sync to input if user hasn't manually typed a custom URL
+  if(!pgUrlManuallyEdited){
+    document.getElementById('pgUrl').value = url;
+  }
   return url;
 }
 function pgAddParam(k,v){
@@ -1503,10 +1123,8 @@ function pgFmt(){ try{ var el=document.getElementById('pgBody'); el.value=JSON.s
 function pgCopy(){ try{ navigator.clipboard.writeText(document.getElementById('pgPre').textContent); }catch(e){} }
 function pgSend(){
   var method=document.getElementById('pgMethod').value;
-  // If user manually edited the URL field, use that directly
-  var urlInput = document.getElementById('pgUrl');
-  pgUpdateUrl(); // sync params to url if not manually edited
-  var url = urlInput.value.trim() || pgUpdateUrl();
+  var url=document.getElementById('pgUrl').value.trim();
+  if(!url) return;
   var btn=document.getElementById('pgSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   var headers={};
@@ -2093,6 +1711,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); line
 
 
 
+
 <script>
 var BASE = 'https://gorest.in';
 var PRESETS = {
@@ -2109,10 +1728,11 @@ var PRESETS = {
   DELETE:[{label:'Delete user', path:'/public/v2/users/1001', params:[], body:''}]
 };
 var currentPath = '/public/v2/users';
+var pgUrlManuallyEdited = false;
 function pgEsc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function pgInit(){ pgMethodChange(); }
 function pgUrlEdited(){
-  // User manually typed in URL — deactivate preset highlights
+  pgUrlManuallyEdited = true;
   document.querySelectorAll('.pg-preset').forEach(function(b){ b.classList.remove('active'); });
 }
 function pgMethodChange(){
@@ -2135,6 +1755,7 @@ function pgLoadPreset(idx){
   if(!p) return;
   document.querySelectorAll('.pg-preset').forEach(function(b,i){ b.classList.toggle('active', i===idx); });
   currentPath = p.path;
+  pgUrlManuallyEdited = false;  // preset click resets the manual edit flag
   pgUpdateUrl();
   var rows = document.getElementById('pgParamRows');
   rows.innerHTML = '';
@@ -2147,7 +1768,10 @@ function pgUpdateUrl(){
   var params = pgGetParams();
   var url = BASE + currentPath;
   if(params.length){ url += '?' + params.map(function(kv){ return encodeURIComponent(kv[0])+'='+encodeURIComponent(kv[1]); }).join('&'); }
-  document.getElementById('pgUrl').value = url;
+  // Only sync to input if user hasn't manually typed a custom URL
+  if(!pgUrlManuallyEdited){
+    document.getElementById('pgUrl').value = url;
+  }
   return url;
 }
 function pgAddParam(k,v){
