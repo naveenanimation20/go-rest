@@ -527,281 +527,106 @@ body {
 .footer-links a { color: var(--text3); text-decoration: none; border-bottom: 1px solid var(--border); padding-bottom: 1px; transition: color .12s, border-color .12s; }
 .footer-links a:hover { color: var(--text); border-color: var(--text3); }
 
-/* ─ PLAYGROUND ──────────────────────────────────── */
-.pg-wrap {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  min-height: 480px;
-}
-.pg-builder {
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-}
-.pg-response {
-  display: flex;
-  flex-direction: column;
-  background: var(--bg2);
-}
+/* ─ PLAYGROUND ───────────────────────────────────────────────────── */
+.pg { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 
-/* url row */
-.pg-url-row {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  border-bottom: 1px solid var(--border);
+.pg-top { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); background: var(--bg3); }
+.pg-method {
+  font-family: var(--mono); font-size: 12px; font-weight: 600;
+  background: var(--bg); border: none; border-right: 1px solid var(--border);
+  color: var(--amber); padding: 0 14px; min-width: 86px; cursor: pointer; outline: none;
+  -webkit-appearance: none; appearance: none;
 }
-.pg-method-sel {
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--bg3);
-  border: none;
-  border-right: 1px solid var(--border);
-  color: var(--text);
-  padding: 0 14px;
-  height: 44px;
-  outline: none;
-  cursor: pointer;
-  min-width: 90px;
-  -webkit-appearance: none;
-  text-align: center;
+.pg-url-display {
+  flex: 1; font-family: var(--mono); font-size: 12.5px; color: var(--green);
+  padding: 0 14px; display: flex; align-items: center; overflow: hidden;
+  white-space: nowrap; text-overflow: ellipsis; min-width: 0;
+  border-right: 1px solid var(--border); cursor: default; user-select: all;
 }
-.pg-endpoint-sel {
-  flex: 1;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  background: transparent;
-  border: none;
-  color: var(--green);
-  padding: 0 12px;
-  height: 44px;
-  outline: none;
-  cursor: pointer;
-  min-width: 0;
-  -webkit-appearance: none;
+.pg-send {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 600; letter-spacing: .3px;
+  background: var(--red); color: #fff; border: none; padding: 0 24px;
+  cursor: pointer; transition: background .12s; white-space: nowrap; min-height: 46px;
 }
-.pg-send-btn {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--mono);
-  font-size: 12px;
-  font-weight: 600;
-  background: var(--red);
-  color: #fff;
-  border: none;
-  height: 44px;
-  padding: 0 20px;
-  cursor: pointer;
-  transition: background .12s;
-  letter-spacing: .3px;
-  flex-shrink: 0;
-}
-.pg-send-btn:hover { background: #c94828; }
-.pg-send-btn:disabled { background: var(--border2); cursor: not-allowed; }
-.pg-send-btn.loading { background: var(--border2); }
+.pg-send:hover { background: #c94828; }
+.pg-send:disabled { background: #3a3a3a; cursor: not-allowed; }
 
-/* tabs */
-.pg-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg2);
+.pg-preset-row { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pg-preset-label { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); flex-shrink: 0; }
+.pg-preset {
+  font-family: var(--mono); font-size: 11px; background: var(--bg); border: 1px solid var(--border);
+  color: var(--text2); padding: 4px 10px; border-radius: 4px; cursor: pointer;
+  transition: border-color .12s, color .12s; white-space: nowrap;
 }
-.pg-tab {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .5px;
-  padding: 9px 16px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text3);
-  cursor: pointer;
-  transition: color .12s, border-color .12s;
-  text-transform: uppercase;
-}
+.pg-preset:hover { border-color: var(--border2); color: var(--text); }
+.pg-preset.active { border-color: var(--red); color: var(--red); }
+
+.pg-body { display: grid; grid-template-columns: 1fr 1fr; min-height: 420px; }
+.pg-left { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.pg-right { display: flex; flex-direction: column; }
+
+.pg-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--bg3); }
+.pg-tab { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; padding: 10px 16px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text3); cursor: pointer; transition: color .12s, border-color .12s; }
 .pg-tab:hover { color: var(--text2); }
-.pg-tab.active { color: var(--text); border-bottom-color: var(--red); }
+.pg-tab.on { color: var(--text); border-bottom-color: var(--red); }
 
-/* panels */
-.pg-panel { padding: 14px 16px; flex: 1; overflow: auto; }
+.pg-panel { flex: 1; padding: 14px; overflow: auto; display: none; }
+.pg-panel.on { display: block; }
 
-/* params table */
-.pg-params-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 10px; }
-.pg-params-table th { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); padding: 0 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
-.pg-params-table td { padding: 4px 4px; vertical-align: middle; }
-.pg-param-input {
-  width: 100%;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12px;
-  padding: 5px 8px;
-  outline: none;
-  transition: border-color .12s;
+.pg-field { margin-bottom: 12px; }
+.pg-field label { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.pg-inp {
+  width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-family: var(--mono); font-size: 12.5px; padding: 7px 10px;
+  outline: none; transition: border-color .12s;
 }
-.pg-param-input:focus { border-color: var(--text3); }
-.pg-param-del {
-  background: transparent;
-  border: none;
-  color: var(--text3);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 2px 6px;
-  line-height: 1;
-  transition: color .12s;
-}
-.pg-param-del:hover { color: #f87171; }
-.pg-add-row {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text3);
-  background: transparent;
-  border: 1px dashed var(--border);
-  border-radius: 4px;
-  padding: 5px 12px;
-  cursor: pointer;
-  transition: color .12s, border-color .12s;
-  width: 100%;
-  text-align: center;
-}
-.pg-add-row:hover { color: var(--text2); border-color: var(--border2); }
+.pg-inp:focus { border-color: var(--text3); }
+textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
 
-/* auth */
-.pg-auth-row { display: flex; align-items: center; gap: 12px; }
-.pg-label { font-family: var(--mono); font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--text3); min-width: 44px; }
-.pg-input {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12.5px;
-  padding: 6px 10px;
-  outline: none;
-  transition: border-color .12s;
-}
-.pg-input:focus { border-color: var(--text3); }
-select.pg-input { cursor: pointer; }
-.pg-auth-hint { margin-top: 12px; font-size: 12px; color: var(--text3); line-height: 1.6; font-family: var(--sans); }
-.pg-auth-hint code { font-family: var(--mono); font-size: 11px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: var(--amber); }
+.pg-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.pg-row .pg-inp { flex: 1; }
+.pg-del { background: transparent; border: 1px solid var(--border); border-radius: 4px; color: var(--text3); padding: 0 10px; cursor: pointer; font-size: 16px; line-height: 1; transition: color .12s; }
+.pg-del:hover { color: #f87171; border-color: #f87171; }
+.pg-add { width: 100%; background: transparent; border: 1px dashed var(--border); border-radius: 4px; color: var(--text3); font-family: var(--mono); font-size: 11px; padding: 6px; cursor: pointer; margin-top: 4px; transition: border-color .12s, color .12s; }
+.pg-add:hover { border-color: var(--border2); color: var(--text2); }
 
-/* body editor */
-.pg-body-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.pg-mini-btn {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  color: var(--text3);
-  padding: 3px 8px;
-  cursor: pointer;
-  transition: color .12s, border-color .12s;
-}
-.pg-mini-btn:hover { color: var(--text); border-color: var(--border2); }
-.pg-body-editor {
-  width: 100%;
-  height: 200px;
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12.5px;
-  padding: 10px 12px;
-  outline: none;
-  resize: vertical;
-  line-height: 1.7;
-  transition: border-color .12s;
-}
-.pg-body-editor:focus { border-color: var(--text3); }
+.pg-hint { font-size: 12px; color: var(--text3); line-height: 1.6; margin-top: 10px; }
+.pg-hint code { font-family: var(--mono); font-size: 11px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; border-radius: 3px; color: var(--amber); }
 
-/* response */
-.pg-res-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg3);
-}
-.pg-res-title { font-family: var(--mono); font-size: 10.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); }
-.pg-res-meta { display: flex; align-items: center; gap: 10px; }
-.pg-status-badge { font-family: var(--mono); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 3px; }
-.status-2xx { background: var(--green-dim); color: var(--green); border: 1px solid #1a5c42; }
-.status-3xx { background: var(--blue-dim); color: var(--blue); border: 1px solid #1a3a6e; }
-.status-4xx { background: var(--amber-dim); color: var(--amber); border: 1px solid #5c3a08; }
-.status-5xx { background: var(--red-dim); color: #f87171; border: 1px solid #5c1a10; }
-.pg-res-time { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.pg-res-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); background: var(--bg3); min-height: 46px; }
+.pg-res-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text3); }
+.pg-badges { display: flex; align-items: center; gap: 8px; }
+.pg-sbadge { font-family: var(--mono); font-size: 12.5px; font-weight: 600; padding: 2px 9px; border-radius: 3px; }
+.s2 { background: var(--green-dim); color: var(--green); border: 1px solid #1a5c42; }
+.s3 { background: var(--blue-dim); color: var(--blue); border: 1px solid #1a3a6e; }
+.s4 { background: var(--amber-dim); color: var(--amber); border: 1px solid #5c3a08; }
+.s5 { background: var(--red-dim); color: #f87171; border: 1px solid #5c1a10; }
+.pg-ms { font-family: var(--mono); font-size: 11px; color: var(--text3); }
+.pg-copy { font-family: var(--mono); font-size: 10.5px; background: transparent; border: 1px solid var(--border); border-radius: 3px; color: var(--text3); padding: 2px 8px; cursor: pointer; transition: color .12s; }
+.pg-copy:hover { color: var(--text); }
 
-.pg-res-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border);
-}
-.pg-res-tab {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .5px;
-  text-transform: uppercase;
-  padding: 8px 16px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  color: var(--text3);
-  cursor: pointer;
-  transition: color .12s, border-color .12s;
-}
-.pg-res-tab:hover { color: var(--text2); }
-.pg-res-tab.active { color: var(--text); border-bottom-color: var(--green); }
+.pg-res-tabs { display: flex; border-bottom: 1px solid var(--border); }
+.pg-rtab { font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; padding: 8px 14px; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text3); cursor: pointer; transition: color .12s, border-color .12s; }
+.pg-rtab:hover { color: var(--text2); }
+.pg-rtab.on { color: var(--text); border-bottom-color: var(--green); }
 
-.pg-res-panel { flex: 1; overflow: auto; }
-.pg-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  color: var(--text3);
-  font-family: var(--mono);
-  font-size: 12px;
-  gap: 4px;
-}
-.pg-res-code {
-  padding: 14px 16px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-  line-height: 1.75;
-  color: var(--text2);
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
-  margin: 0;
-}
-.pg-headers-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.pg-headers-table tr { border-bottom: 1px solid var(--border); }
-.pg-headers-table td { padding: 7px 16px; vertical-align: top; }
-.pg-headers-table td:first-child { font-family: var(--mono); color: var(--blue); width: 45%; word-break: break-all; }
-.pg-headers-table td:last-child { font-family: var(--mono); color: var(--text2); word-break: break-all; }
+.pg-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; color: var(--text3); font-family: var(--mono); font-size: 12px; gap: 8px; padding: 40px; text-align: center; }
+.pg-pre { margin: 0; padding: 14px; font-family: var(--mono); font-size: 12.5px; line-height: 1.75; color: var(--text2); white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; overflow: auto; flex: 1; }
+.pg-htable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pg-htable tr { border-bottom: 1px solid var(--border); }
+.pg-htable tr:hover { background: var(--bg3); }
+.pg-htable td { padding: 7px 14px; vertical-align: top; font-family: var(--mono); }
+.pg-htable td:first-child { color: var(--blue); width: 45%; word-break: break-all; }
+.pg-htable td:last-child { color: var(--text2); word-break: break-all; }
 
-/* JSON syntax highlight */
-.jk { color: #e2b55e; }
-.js { color: var(--green); }
-.jn { color: #d08b5b; }
-.jb { color: var(--blue); }
-.jnull { color: var(--text3); }
-.jerr { color: #f87171; }
+.jk { color: #e2b55e; } .jstr { color: #34d399; } .jnum { color: #d08b5b; } .jbool { color: #4f9cf9; } .jnull { color: #6e7f8d; }
+
+@keyframes pgSpin { to { transform: rotate(360deg); } }
+.spinning { animation: pgSpin .6s linear infinite; display: inline-block; }
 
 @media (max-width: 860px) {
-  .pg-wrap { grid-template-columns: 1fr; }
-  .pg-builder { border-right: none; border-bottom: 1px solid var(--border); }
+  .pg-body { grid-template-columns: 1fr; }
+  .pg-left { border-right: none; border-bottom: 1px solid var(--border); }
 }
 
 @media (max-width: 800px) {
@@ -1085,108 +910,96 @@ select.pg-input { cursor: pointer; }
           <tr><td>Replaces</td><td>gorest.co.in — same URL structure, existing Postman collections work as-is.</td></tr>
         </table>
 
-      <!-- 10 PLAYGROUND -->
+      
+
+<!-- 10 PLAYGROUND -->
       <div class="sec" id="playground">
         <div class="sec-head"><span class="sec-num">10</span><span class="sec-title">Try It — Live Playground</span></div>
 
-        <div class="pg-wrap">
+        <div class="pg" id="pg">
 
-          <!-- REQUEST BUILDER -->
-          <div class="pg-builder">
-
-            <!-- Method + URL row -->
-            <div class="pg-url-row">
-              <select id="pg-method" class="pg-method-sel">
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="PATCH">PATCH</option>
-                <option value="DELETE">DELETE</option>
-              </select>
-              <select id="pg-endpoint" class="pg-endpoint-sel"></select>
-              <button id="pg-send" class="pg-send-btn" onclick="pgSend()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                Send
-              </button>
-            </div>
-
-            <!-- Tabs: Params / Auth / Body -->
-            <div class="pg-tabs">
-              <button class="pg-tab active" onclick="pgTab(this,'params')">Query Params</button>
-              <button class="pg-tab" onclick="pgTab(this,'auth')">Auth</button>
-              <button class="pg-tab" onclick="pgTab(this,'body')">Body</button>
-            </div>
-
-            <!-- PARAMS panel -->
-            <div id="pg-panel-params" class="pg-panel">
-              <table class="pg-params-table" id="pg-params-table">
-                <thead><tr><th>Key</th><th>Value</th><th></th></tr></thead>
-                <tbody id="pg-params-body"></tbody>
-              </table>
-              <button class="pg-add-row" onclick="pgAddParam()">+ Add param</button>
-            </div>
-
-            <!-- AUTH panel -->
-            <div id="pg-panel-auth" class="pg-panel" style="display:none">
-              <div class="pg-auth-row">
-                <label class="pg-label">Type</label>
-                <select id="pg-auth-type" class="pg-input" style="width:160px" onchange="pgAuthTypeChange()">
-                  <option value="none">No Auth</option>
-                  <option value="bearer" selected>Bearer Token</option>
-                </select>
-              </div>
-              <div id="pg-auth-token-row" class="pg-auth-row" style="margin-top:10px">
-                <label class="pg-label">Token</label>
-                <input id="pg-auth-token" class="pg-input" type="text" value="demo-token" placeholder="any-string-works" style="flex:1">
-              </div>
-              <div class="pg-auth-hint">Any non-empty token is accepted. Use <code>blocked-token</code> to trigger 403.</div>
-            </div>
-
-            <!-- BODY panel -->
-            <div id="pg-panel-body" class="pg-panel" style="display:none">
-              <div class="pg-body-toolbar">
-                <span class="pg-label">JSON Body</span>
-                <button class="pg-mini-btn" onclick="pgFormatBody()">Format</button>
-                <button class="pg-mini-btn" onclick="pgClearBody()">Clear</button>
-              </div>
-              <textarea id="pg-body" class="pg-body-editor" spellcheck="false" placeholder='{"name":"","email":"","gender":"male","status":"active"}'></textarea>
-            </div>
-
+          <!-- TOP: method + url + send -->
+          <div class="pg-top">
+            <select class="pg-method" id="pgMethod" onchange="pgMethodChange()">
+              <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option><option>DELETE</option>
+            </select>
+            <div class="pg-url-display" id="pgUrl">https://gorest.in/public/v2/users</div>
+            <button class="pg-send" id="pgSendBtn" onclick="pgSend()">&#9654; Send</button>
           </div>
 
-          <!-- RESPONSE PANEL -->
-          <div class="pg-response">
-            <div class="pg-res-header">
-              <span class="pg-res-title">Response</span>
-              <div class="pg-res-meta" id="pg-res-meta" style="display:none">
-                <span id="pg-res-status" class="pg-status-badge"></span>
-                <span id="pg-res-time" class="pg-res-time"></span>
-                <button class="pg-mini-btn" onclick="pgCopyRes()">Copy</button>
+          <!-- PRESET BUTTONS -->
+          <div class="pg-preset-row" id="pgPresets"></div>
+
+          <!-- SPLIT: left=builder, right=response -->
+          <div class="pg-body">
+
+            <!-- LEFT: builder -->
+            <div class="pg-left">
+              <div class="pg-tabs">
+                <button class="pg-tab on" onclick="pgTab(this,'params')">Query Params</button>
+                <button class="pg-tab" onclick="pgTab(this,'auth')">Auth</button>
+                <button class="pg-tab" onclick="pgTab(this,'body')">Body</button>
+              </div>
+
+              <!-- params -->
+              <div class="pg-panel on" id="pg-params">
+                <div id="pgParamRows"></div>
+                <button class="pg-add" onclick="pgAddParam()">+ Add param</button>
+              </div>
+
+              <!-- auth -->
+              <div class="pg-panel" id="pg-auth">
+                <div class="pg-field">
+                  <label>Bearer Token</label>
+                  <input class="pg-inp" id="pgToken" type="text" value="demo-token" placeholder="any string works">
+                </div>
+                <div class="pg-field">
+                  <label style="margin-bottom:0">Include Auth Header</label>
+                  <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--text2)">
+                    <input type="checkbox" id="pgAuthOn" checked style="width:14px;height:14px;cursor:pointer"> Send Authorization header
+                  </label>
+                </div>
+                <div class="pg-hint">Any non-empty token is accepted. Use <code>blocked-token</code> to trigger 403.</div>
+              </div>
+
+              <!-- body -->
+              <div class="pg-panel" id="pg-body">
+                <div class="pg-field">
+                  <label>JSON Body &nbsp;<button class="pg-copy" onclick="pgFmt()" style="margin-left:4px">Format</button></label>
+                  <textarea class="pg-inp" id="pgBody" spellcheck="false" placeholder='{"name":"","email":"","gender":"male","status":"active"}'></textarea>
+                </div>
               </div>
             </div>
 
-            <!-- Response sub-tabs -->
-            <div class="pg-res-tabs" id="pg-res-tabs" style="display:none">
-              <button class="pg-res-tab active" onclick="pgResTab(this,'body')">Body</button>
-              <button class="pg-res-tab" onclick="pgResTab(this,'headers')">Headers</button>
-            </div>
-
-            <div id="pg-res-body-panel" class="pg-res-panel">
-              <div id="pg-placeholder" class="pg-placeholder">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:10px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <span>Hit Send to see the response</span>
+            <!-- RIGHT: response -->
+            <div class="pg-right">
+              <div class="pg-res-head">
+                <span class="pg-res-label">Response</span>
+                <div class="pg-badges" id="pgBadges" style="display:none">
+                  <span class="pg-sbadge" id="pgStatus"></span>
+                  <span class="pg-ms" id="pgMs"></span>
+                  <button class="pg-copy" onclick="pgCopy()">Copy</button>
+                </div>
               </div>
-              <pre id="pg-res-body" class="pg-res-code" style="display:none"></pre>
-            </div>
-
-            <div id="pg-res-headers-panel" class="pg-res-panel" style="display:none">
-              <table class="pg-headers-table" id="pg-headers-table"></table>
+              <div class="pg-res-tabs" id="pgResTabs" style="display:none">
+                <button class="pg-rtab on" onclick="pgRTab(this,'body')">Body</button>
+                <button class="pg-rtab" onclick="pgRTab(this,'headers')">Headers</button>
+              </div>
+              <div id="pgResBody" style="display:flex;flex-direction:column;flex:1">
+                <div class="pg-empty" id="pgEmpty">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.25"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Hit Send to see the response
+                </div>
+                <pre class="pg-pre" id="pgPre" style="display:none"></pre>
+              </div>
+              <div id="pgResHeaders" style="display:none;overflow:auto;flex:1">
+                <table class="pg-htable" id="pgHTable"></table>
+              </div>
             </div>
 
           </div>
         </div>
       </div>
-
 
     </main>
   </div>
@@ -1204,253 +1017,204 @@ select.pg-input { cursor: pointer; }
 
 </div>
 
+
+
 <script>
-// ── Endpoint definitions ────────────────────────────────────────────
-const PG_ENDPOINTS = {
-  GET: [
-    { label: "GET /users — list all",         path: "/public/v2/users",        params: [{k:"page",v:"1"},{k:"per_page",v:"10"}], body: false },
-    { label: "GET /users — filter status",    path: "/public/v2/users",        params: [{k:"status",v:"active"}], body: false },
-    { label: "GET /users — filter gender",    path: "/public/v2/users",        params: [{k:"gender",v:"male"}], body: false },
-    { label: "GET /users/:id — single user",  path: "/public/v2/users/1001",   params: [], body: false },
-    { label: "GET /users.xml — XML format",   path: "/public/v2/users.xml",    params: [], body: false },
+(function(){
+const BASE = 'https://gorest.in';
+const PRESETS = {
+  GET:[
+    {label:'List users',    path:'/public/v2/users',      params:[{k:'page',v:'1'},{k:'per_page',v:'10'}], body:''},
+    {label:'Filter active', path:'/public/v2/users',      params:[{k:'status',v:'active'}], body:''},
+    {label:'Filter male',   path:'/public/v2/users',      params:[{k:'gender',v:'male'}], body:''},
+    {label:'Single user',   path:'/public/v2/users/1001', params:[], body:''},
+    {label:'As XML',        path:'/public/v2/users.xml',  params:[], body:''},
   ],
-  POST: [
-    { label: "POST /users — create user",     path: "/public/v2/users",        params: [], body: true,
-      defaultBody: '{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}' },
+  POST:[
+    {label:'Create user', path:'/public/v2/users', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen@example.com",\n  "gender": "male",\n  "status": "active"\n}'},
   ],
-  PUT: [
-    { label: "PUT /users/:id — full update",  path: "/public/v2/users/1001",   params: [], body: true,
-      defaultBody: '{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}' },
+  PUT:[
+    {label:'Full update', path:'/public/v2/users/1001', params:[], body:'{\n  "name": "Naveen Kumar",\n  "email": "naveen.updated@example.com",\n  "gender": "male",\n  "status": "inactive"\n}'},
   ],
-  PATCH: [
-    { label: "PATCH /users/:id — partial",    path: "/public/v2/users/1001",   params: [], body: true,
-      defaultBody: '{\n  "status": "inactive"\n}' },
+  PATCH:[
+    {label:'Partial update', path:'/public/v2/users/1001', params:[], body:'{\n  "status": "inactive"\n}'},
   ],
-  DELETE: [
-    { label: "DELETE /users/:id — delete",    path: "/public/v2/users/1001",   params: [], body: false },
+  DELETE:[
+    {label:'Delete user', path:'/public/v2/users/1001', params:[], body:''},
   ],
 };
 
-// ── Init ─────────────────────────────────────────────────────────────
-function pgInit() {
-  pgUpdateEndpoints();
-  document.getElementById('pg-method').addEventListener('change', pgUpdateEndpoints);
-  document.getElementById('pg-endpoint').addEventListener('change', pgEndpointChanged);
+let currentPath = '/public/v2/users';
+let currentPreset = 0;
+
+function init(){
+  pgMethodChange();
 }
 
-function pgUpdateEndpoints() {
-  const method = document.getElementById('pg-method').value;
-  const sel = document.getElementById('pg-endpoint');
-  sel.innerHTML = '';
-  (PG_ENDPOINTS[method] || []).forEach((ep, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = ep.path;
-    sel.appendChild(opt);
+window.pgMethodChange = function(){
+  const m = document.getElementById('pgMethod').value;
+  const presets = PRESETS[m] || [];
+  const row = document.getElementById('pgPresets');
+  row.innerHTML = '<span class="pg-preset-label">Quick:</span>';
+  presets.forEach((p,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'pg-preset' + (i===0?' active':'');
+    btn.textContent = p.label;
+    btn.onclick = ()=>pgLoadPreset(m,i);
+    row.appendChild(btn);
   });
-  pgEndpointChanged();
+  pgLoadPreset(m, 0);
+};
+
+function pgLoadPreset(method, idx){
+  currentPreset = idx;
+  document.querySelectorAll('.pg-preset').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  const p = (PRESETS[method]||[])[idx];
+  if(!p) return;
+  currentPath = p.path;
+  pgUpdateUrl();
+  // params
+  const rows = document.getElementById('pgParamRows');
+  rows.innerHTML = '';
+  p.params.forEach(({k,v})=>pgAddParam(k,v));
+  // body
+  document.getElementById('pgBody').value = p.body || '';
 }
 
-function pgEndpointChanged() {
-  const method = document.getElementById('pg-method').value;
-  const idx = document.getElementById('pg-endpoint').value;
-  const ep = (PG_ENDPOINTS[method] || [])[idx];
-  if (!ep) return;
-  // Set params
-  const tbody = document.getElementById('pg-params-body');
-  tbody.innerHTML = '';
-  ep.params.forEach(p => pgAddParam(p.k, p.v));
-  // Set body
-  const bodyEl = document.getElementById('pg-body');
-  if (ep.body && ep.defaultBody) {
-    bodyEl.value = ep.defaultBody;
-  } else {
-    bodyEl.value = '';
-  }
-}
-
-// ── Params ───────────────────────────────────────────────────────────
-function pgAddParam(key='', val='') {
-  const tbody = document.getElementById('pg-params-body');
-  const tr = document.createElement('tr');
-  tr.innerHTML = \`
-    <td><input class="pg-param-input" type="text" placeholder="key" value="\${escHtml(key)}"></td>
-    <td><input class="pg-param-input" type="text" placeholder="value" value="\${escHtml(val)}"></td>
-    <td><button class="pg-param-del" onclick="this.closest('tr').remove()" title="Remove">×</button></td>
-  \`;
-  tbody.appendChild(tr);
-}
-
-function pgGetParams() {
-  const rows = document.querySelectorAll('#pg-params-body tr');
-  const params = [];
-  rows.forEach(tr => {
-    const inputs = tr.querySelectorAll('input');
-    const k = inputs[0].value.trim();
-    const v = inputs[1].value.trim();
-    if (k) params.push([k, v]);
-  });
-  return params;
-}
-
-// ── Tabs ─────────────────────────────────────────────────────────────
-function pgTab(btn, name) {
-  document.querySelectorAll('.pg-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  ['params','auth','body'].forEach(p => {
-    document.getElementById('pg-panel-' + p).style.display = p === name ? '' : 'none';
-  });
-}
-
-function pgResTab(btn, name) {
-  document.querySelectorAll('.pg-res-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('pg-res-body-panel').style.display = name === 'body' ? '' : 'none';
-  document.getElementById('pg-res-headers-panel').style.display = name === 'headers' ? '' : 'none';
-}
-
-function pgAuthTypeChange() {
-  const type = document.getElementById('pg-auth-type').value;
-  document.getElementById('pg-auth-token-row').style.display = type === 'bearer' ? '' : 'none';
-}
-
-// ── Send ─────────────────────────────────────────────────────────────
-async function pgSend() {
-  const method = document.getElementById('pg-method').value;
-  const idx = document.getElementById('pg-endpoint').value;
-  const ep = (PG_ENDPOINTS[method] || [])[idx];
-  if (!ep) return;
-
-  const btn = document.getElementById('pg-send');
-  btn.disabled = true;
-  btn.classList.add('loading');
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2a10 10 0 1 0 10 10"/></svg> Sending…';
-
-  // Build URL
+function pgUpdateUrl(){
   const params = pgGetParams();
-  let url = 'https://gorest.in' + ep.path;
-  if (params.length) {
-    url += '?' + params.map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
-  }
+  let url = BASE + currentPath;
+  if(params.length) url += '?' + params.map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+  document.getElementById('pgUrl').textContent = url;
+  return url;
+}
 
-  // Build headers
+window.pgAddParam = function(k='',v=''){
+  const rows = document.getElementById('pgParamRows');
+  const div = document.createElement('div');
+  div.className = 'pg-row';
+  div.innerHTML = '<input class="pg-inp" placeholder="key" value="'+esc(k)+'" oninput="pgUpdateUrl()"><input class="pg-inp" placeholder="value" value="'+esc(v)+'" oninput="pgUpdateUrl()"><button class="pg-del" onclick="this.parentNode.remove();pgUpdateUrl()" title="Remove">&times;</button>';
+  rows.appendChild(div);
+  pgUpdateUrl();
+};
+
+function pgGetParams(){
+  const pairs = [];
+  document.querySelectorAll('#pgParamRows .pg-row').forEach(row=>{
+    const ins = row.querySelectorAll('input');
+    const k = ins[0].value.trim(), v = ins[1].value.trim();
+    if(k) pairs.push([k,v]);
+  });
+  return pairs;
+}
+
+window.pgTab = function(btn, name){
+  document.querySelectorAll('.pg-tab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  ['params','auth','body'].forEach(n=>{
+    document.getElementById('pg-'+n).classList.toggle('on', n===name);
+  });
+};
+
+window.pgRTab = function(btn, name){
+  document.querySelectorAll('.pg-rtab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('pgResBody').style.display  = name==='body'    ? 'flex' : 'none';
+  document.getElementById('pgResHeaders').style.display = name==='headers' ? 'block' : 'none';
+};
+
+window.pgFmt = function(){
+  try{ const el=document.getElementById('pgBody'); el.value=JSON.stringify(JSON.parse(el.value),null,2); }catch(e){}
+};
+
+window.pgCopy = function(){
+  navigator.clipboard.writeText(document.getElementById('pgPre').textContent).catch(()=>{});
+};
+
+window.pgSend = async function(){
+  const method = document.getElementById('pgMethod').value;
+  const url = pgUpdateUrl();
+  const btn = document.getElementById('pgSendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinning">&#8635;</span> Sending';
+
   const headers = {};
-  const authType = document.getElementById('pg-auth-type').value;
-  if (authType === 'bearer') {
-    const token = document.getElementById('pg-auth-token').value.trim();
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-  }
-  if (['POST','PUT','PATCH'].includes(method)) {
-    headers['Content-Type'] = 'application/json';
-  }
+  const authOn = document.getElementById('pgAuthOn').checked;
+  const token  = document.getElementById('pgToken').value.trim();
+  if(authOn && token) headers['Authorization'] = 'Bearer ' + token;
+  if(['POST','PUT','PATCH'].includes(method)) headers['Content-Type'] = 'application/json';
 
-  // Body
-  let body = undefined;
-  if (['POST','PUT','PATCH'].includes(method)) {
-    body = document.getElementById('pg-body').value.trim() || undefined;
-  }
+  const bodyVal = document.getElementById('pgBody').value.trim();
+  const fetchOpts = { method, headers };
+  if(['POST','PUT','PATCH'].includes(method) && bodyVal) fetchOpts.body = bodyVal;
 
   const t0 = Date.now();
-  try {
-    const res = await fetch(url, { method, headers, body });
-    const elapsed = Date.now() - t0;
-    const resText = await res.text();
-    const resHeaders = {};
-    res.headers.forEach((v, k) => { resHeaders[k] = v; });
-    pgShowResponse(res.status, elapsed, resText, resHeaders);
-  } catch (err) {
-    pgShowError(err.message);
+  try{
+    const res = await fetch(url, fetchOpts);
+    const ms  = Date.now() - t0;
+    const txt = await res.text();
+    const hdrs = {};
+    res.headers.forEach((v,k)=>{ hdrs[k]=v; });
+    pgShow(res.status, ms, txt, hdrs);
+  }catch(err){
+    pgShowErr(err.message);
   }
 
   btn.disabled = false;
-  btn.classList.remove('loading');
-  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send';
-}
+  btn.innerHTML = '&#9654; Send';
+};
 
-// ── Response rendering ────────────────────────────────────────────────
-function pgShowResponse(status, ms, body, headers) {
-  document.getElementById('pg-placeholder').style.display = 'none';
-  document.getElementById('pg-res-meta').style.display = 'flex';
-  document.getElementById('pg-res-tabs').style.display = 'flex';
+function pgShow(status, ms, body, headers){
+  document.getElementById('pgEmpty').style.display = 'none';
+  document.getElementById('pgBadges').style.display = 'flex';
+  document.getElementById('pgResTabs').style.display = 'flex';
 
-  // Status badge
-  const badge = document.getElementById('pg-res-status');
+  const badge = document.getElementById('pgStatus');
   badge.textContent = status;
-  badge.className = 'pg-status-badge ' + (status < 300 ? 'status-2xx' : status < 400 ? 'status-3xx' : status < 500 ? 'status-4xx' : 'status-5xx');
+  badge.className = 'pg-sbadge ' + (status<300?'s2':status<400?'s3':status<500?'s4':'s5');
+  document.getElementById('pgMs').textContent = ms + ' ms';
 
-  // Time
-  document.getElementById('pg-res-time').textContent = ms + ' ms';
+  const pre = document.getElementById('pgPre');
+  pre.style.display = 'block';
+  pre.innerHTML = hlJson(body);
 
-  // Body
-  const bodyEl = document.getElementById('pg-res-body');
-  bodyEl.style.display = 'block';
-  bodyEl.innerHTML = pgHighlight(body);
+  const tbl = document.getElementById('pgHTable');
+  tbl.innerHTML = Object.entries(headers).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td>'+esc(v)+'</td></tr>').join('');
 
-  // Headers table
-  const tbl = document.getElementById('pg-headers-table');
-  tbl.innerHTML = Object.entries(headers).map(([k,v]) =>
-    \`<tr><td>\${escHtml(k)}</td><td>\${escHtml(v)}</td></tr>\`
-  ).join('');
-
-  // Switch to body tab
-  pgResTab(document.querySelector('.pg-res-tab'), 'body');
+  pgRTab(document.querySelector('.pg-rtab'), 'body');
+  document.getElementById('pgResBody').style.display = 'flex';
+  document.getElementById('pgResHeaders').style.display = 'none';
 }
 
-function pgShowError(msg) {
-  document.getElementById('pg-placeholder').style.display = 'none';
-  document.getElementById('pg-res-meta').style.display = 'none';
-  document.getElementById('pg-res-tabs').style.display = 'none';
-  const bodyEl = document.getElementById('pg-res-body');
-  bodyEl.style.display = 'block';
-  bodyEl.innerHTML = \`<span class="jerr">Error: \${escHtml(msg)}</span>\`;
+function pgShowErr(msg){
+  document.getElementById('pgEmpty').style.display = 'none';
+  document.getElementById('pgBadges').style.display = 'none';
+  document.getElementById('pgResTabs').style.display = 'none';
+  const pre = document.getElementById('pgPre');
+  pre.style.display = 'block';
+  pre.innerHTML = '<span style="color:#f87171">Error: ' + esc(msg) + '</span>';
+  document.getElementById('pgResBody').style.display = 'flex';
 }
 
-// ── JSON syntax highlighter ──────────────────────────────────────────
-function pgHighlight(text) {
-  try {
-    const obj = JSON.parse(text);
-    return syntaxHL(JSON.stringify(obj, null, 2));
-  } catch {
-    // XML or plain text
-    if (text.trim().startsWith('<')) return escHtml(text);
-    return escHtml(text);
+function hlJson(txt){
+  try{
+    const obj = JSON.parse(txt);
+    return esc(JSON.stringify(obj,null,2))
+      .replace(/(&quot;)([\w\s-]+)(&quot;)(\s*:)/g,'<span class="jk">$1$2$3</span>$4')
+      .replace(/:\s*(&quot;)(.*?)(&quot;)/g,': <span class="jstr">$1$2$3</span>')
+      .replace(/:\s*(-?\d+\.?\d*)/g,': <span class="jnum">$1</span>')
+      .replace(/:\s*(true|false)/g,': <span class="jbool">$1</span>')
+      .replace(/:\s*(null)/g,': <span class="jnull">$1</span>');
+  }catch{
+    return esc(txt);
   }
 }
 
-function syntaxHL(json) {
-  return escHtml(json)
-    .replace(/(&quot;)(.*?)(&quot;)(\s*:)/g, '<span class="jk">$1$2$3</span>$4')
-    .replace(/:\s*(&quot;)(.*?)(&quot;)/g, ': <span class="js">$1$2$3</span>')
-    .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="jn">$1</span>')
-    .replace(/:\s*(true|false)/g, ': <span class="jb">$1</span>')
-    .replace(/:\s*(null)/g, ': <span class="jnull">$1</span>');
-}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────
-function pgFormatBody() {
-  try {
-    const el = document.getElementById('pg-body');
-    el.value = JSON.stringify(JSON.parse(el.value), null, 2);
-  } catch {}
-}
-function pgClearBody() { document.getElementById('pg-body').value = ''; }
-function pgCopyRes() {
-  const txt = document.getElementById('pg-res-body').textContent;
-  navigator.clipboard.writeText(txt).catch(() => {});
-}
-
-// spin animation for loading
-const spinStyle = document.createElement('style');
-spinStyle.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-document.head.appendChild(spinStyle);
-
-document.addEventListener('DOMContentLoaded', pgInit);
+document.addEventListener('DOMContentLoaded', init);
+})();
 </script>
-
 </body>
 </html>`);
 
