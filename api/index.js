@@ -1390,7 +1390,12 @@ function errorsToXml(errors) {
 
 // Detect if client wants XML — via .xml suffix or Accept header
 function wantsXml(req, xmlSuffix) {
-  return xmlSuffix || (req.headers["accept"] && req.headers["accept"].includes("application/xml"));
+  if (xmlSuffix) return true;
+  const accept = req.headers["accept"] || "";
+  // Only return XML if client explicitly wants ONLY xml (curl/Postman: "application/xml")
+  // Browsers send "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+  // — must NOT treat that as an XML request
+  return accept.includes("application/xml") && !accept.includes("text/html") && !accept.includes("*/*");
 }
 
 function sendData(res, status, data, xml, isXml) {
