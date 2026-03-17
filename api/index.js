@@ -939,6 +939,7 @@ textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
             <div class="pg-left">
               <div class="pg-tabs">
                 <button class="pg-tab on" onclick="pgTab(this,'params')">Query Params</button>
+                <button class="pg-tab" onclick="pgTab(this,'headers')">Headers</button>
                 <button class="pg-tab" onclick="pgTab(this,'auth')">Auth</button>
                 <button class="pg-tab" onclick="pgTab(this,'body')">Body</button>
               </div>
@@ -947,6 +948,12 @@ textarea.pg-inp { resize: vertical; min-height: 140px; line-height: 1.7; }
               <div class="pg-panel on" id="pg-params">
                 <div id="pgParamRows"></div>
                 <button class="pg-add" onclick="pgAddParam()">+ Add param</button>
+              </div>
+
+              <!-- headers -->
+              <div class="pg-panel" id="pg-headers">
+                <div id="pgHeaderRows"></div>
+                <button class="pg-add" onclick="pgAddHeader()">+ Add header</button>
               </div>
 
               <!-- auth -->
@@ -1086,6 +1093,27 @@ function pgUpdateUrl(){
   }
   return url;
 }
+function pgAddHeader(k,v){
+  k=k||''; v=v||'';
+  var rows=document.getElementById('pgHeaderRows');
+  var div=document.createElement('div');
+  div.className='pg-row';
+  var ki=document.createElement('input'); ki.className='pg-inp'; ki.placeholder='Header name'; ki.value=k;
+  var vi=document.createElement('input'); vi.className='pg-inp'; vi.placeholder='Value'; vi.value=v;
+  var dl=document.createElement('button'); dl.className='pg-del'; dl.textContent='x'; dl.title='Remove';
+  dl.onclick=function(){ this.parentNode.remove(); };
+  div.appendChild(ki); div.appendChild(vi); div.appendChild(dl);
+  rows.appendChild(div);
+}
+function pgGetHeaders(){
+  var hdrs={};
+  document.querySelectorAll('#pgHeaderRows .pg-row').forEach(function(row){
+    var ins=row.querySelectorAll('input');
+    var k=ins[0].value.trim(), v=ins[1].value.trim();
+    if(k) hdrs[k]=v;
+  });
+  return hdrs;
+}
 function pgAddParam(k,v){
   k=k||''; v=v||'';
   var rows = document.getElementById('pgParamRows');
@@ -1111,7 +1139,7 @@ function pgGetParams(){
 function pgTab(btn,name){
   document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
   btn.classList.add('on');
-  ['params','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
+  ['params','headers','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
 }
 function pgRTab(btn,name){
   document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
@@ -1128,10 +1156,15 @@ function pgSend(){
   var btn=document.getElementById('pgSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   var headers={};
+  // Merge custom headers from Headers tab first (lowest priority)
+  var customHdrs=pgGetHeaders();
+  Object.keys(customHdrs).forEach(function(k){ headers[k]=customHdrs[k]; });
+  // Auth header (overrides custom if same key)
   if(document.getElementById('pgAuthOn').checked){
     var tok=document.getElementById('pgToken').value.trim();
     if(tok) headers['Authorization']='Bearer '+tok;
   }
+  // Content-Type for write ops (overrides custom if same key)
   if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type']='application/json';
   var bodyVal=document.getElementById('pgBody').value.trim();
   var opts={method:method,headers:headers};
@@ -1799,7 +1832,7 @@ function pgGetParams(){
 function pgTab(btn,name){
   document.querySelectorAll('.pg-tab').forEach(function(t){ t.classList.remove('on'); });
   btn.classList.add('on');
-  ['params','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
+  ['params','headers','auth','body'].forEach(function(n){ document.getElementById('pg-'+n).classList.toggle('on',n===name); });
 }
 function pgRTab(btn,name){
   document.querySelectorAll('.pg-rtab').forEach(function(t){ t.classList.remove('on'); });
@@ -1815,10 +1848,15 @@ function pgSend(){
   var btn=document.getElementById('pgSendBtn');
   btn.disabled=true; btn.textContent='Sending...';
   var headers={};
+  // Merge custom headers from Headers tab first (lowest priority)
+  var customHdrs=pgGetHeaders();
+  Object.keys(customHdrs).forEach(function(k){ headers[k]=customHdrs[k]; });
+  // Auth header (overrides custom if same key)
   if(document.getElementById('pgAuthOn').checked){
     var tok=document.getElementById('pgToken').value.trim();
     if(tok) headers['Authorization']='Bearer '+tok;
   }
+  // Content-Type for write ops (overrides custom if same key)
   if(method==='POST'||method==='PUT'||method==='PATCH') headers['Content-Type']='application/json';
   var bodyVal=document.getElementById('pgBody').value.trim();
   var opts={method:method,headers:headers};
